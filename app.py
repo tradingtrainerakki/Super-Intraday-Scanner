@@ -1524,7 +1524,7 @@ with tab1:
                     ])
                 )
 
-                st.dataframe(styled, use_container_width=True, height=500)
+                st.markdown(styled.to_html(escape=False), unsafe_allow_html=True)
 
                 # CSV Download
                 csv = df_results.to_csv(index=False).encode('utf-8')
@@ -1685,7 +1685,7 @@ with tab3:
                 {'selector':'tbody td','props':[('padding','10px 12px'),('border-bottom','1px solid #1e2d3d')]},
             ])
         )
-        st.dataframe(styled_j, use_container_width=True, height=420)
+        st.markdown(styled_j.to_html(escape=False), unsafe_allow_html=True)
 
         if st.button("🗑️ Clear Journal"):
             save_journal([])
