@@ -1177,7 +1177,14 @@ def display_signal_card(result):
         oi_badge = ''
 
     # Accuracy badge
-    acc = int(result['ACCURACY'].replace('%',''))
+    try:
+        acc_val = result['ACCURACY']
+        if isinstance(acc_val, (int, float)):
+            acc = int(acc_val)
+        else:
+            acc = int(str(acc_val).replace('%','').strip())
+    except (ValueError, TypeError):
+        acc = 0
     if acc >= 90:
         acc_class = "acc-90"
     elif acc >= 80:
