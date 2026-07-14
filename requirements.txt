@@ -1,0 +1,24 @@
+# SUPER SCANNER PRO - Requirements
+# Install: pip install -r requirements.txt
+
+# Core
+streamlit>=1.30.0
+pandas>=2.0.0
+numpy>=1.24.0
+
+# Data Sources
+yfinance>=0.2.28
+requests>=2.31.0
+
+# NSE Data (for OI Spurts)
+nsepython>=0.0.2
+
+# Charts
+plotly>=5.18.0
+
+# Timezone
+pytz>=2023.3
+
+# Optional (for enhanced features)
+# beautifulsoup4>=4.12.0  # Web scraping fallback
+# lxml>=4.9.0            # XML parsing
