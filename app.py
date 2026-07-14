@@ -48,6 +48,9 @@ if "authenticated" not in st.session_state:
     st.session_state.authenticated = False
     st.session_state.username = ""
 
+if "theme" not in st.session_state:
+    st.session_state.theme = "DARK"
+
 if not st.session_state.authenticated:
     st.markdown("""
     <style>
@@ -93,188 +96,278 @@ if not st.session_state.authenticated:
 # ============================================================
 # GLOBAL STYLES
 # ============================================================
-st.markdown("""
+
+# ============================================================
+# THEME SYSTEM
+# ============================================================
+THEMES = {
+    "DARK": {
+        "bg_main": "#080c12", "bg_card": "#0d1a26", "bg_card_alt": "#111820",
+        "text_main": "#c8d8e8", "text_dim": "#6a8aaa", "text_dark": "#3a5a7a",
+        "border": "#1e2d3d", "border_hover": "#00d4ff55",
+        "accent_cyan": "#00d4ff", "accent_green": "#00ff88", "accent_red": "#ff4060",
+        "accent_orange": "#ff6b6b", "accent_yellow": "#ffc700",
+        "candle_up": "#00ff88", "candle_down": "#ff4060",
+    },
+    "LIGHT": {
+        "bg_main": "#f0f4f8", "bg_card": "#ffffff", "bg_card_alt": "#f8fafc",
+        "text_main": "#1a2332", "text_dim": "#5a6a7a", "text_dark": "#8a9aaa",
+        "border": "#d0d8e0", "border_hover": "#0066cc55",
+        "accent_cyan": "#0066cc", "accent_green": "#00aa44", "accent_red": "#cc2244",
+        "accent_orange": "#dd5533", "accent_yellow": "#cc8800",
+        "candle_up": "#00aa44", "candle_down": "#cc2244",
+    },
+    "MODERATE": {
+        "bg_main": "#121820", "bg_card": "#1a2436", "bg_card_alt": "#162030",
+        "text_main": "#d0dce8", "text_dim": "#7a8aaa", "text_dark": "#4a5a6a",
+        "border": "#2a3a50", "border_hover": "#4488cc55",
+        "accent_cyan": "#4488cc", "accent_green": "#44aa66", "accent_red": "#cc4455",
+        "accent_orange": "#cc6644", "accent_yellow": "#cc9944",
+        "candle_up": "#44aa66", "candle_down": "#cc4455",
+    }
+}
+
+
+# Apply dynamic theme CSS
+T = THEMES[st.session_state.theme]
+is_dark = st.session_state.theme in ["DARK", "MODERATE"]
+is_light = st.session_state.theme == "LIGHT"
+
+st.markdown(f"""
 <style>
 @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Syne:wght@700;800&display=swap');
-html, body, [class*="css"] {
+html, body, [class*="css"] {{
     font-family: 'JetBrains Mono', monospace !important;
-    background-color: #080c12 !important;
-    color: #c8d8e8 !important;
-}
-.main { background-color: #080c12 !important; }
-section[data-testid="stSidebar"] { background-color: #0d1219 !important; border-right: 1px solid #1e2d3d !important; }
-#MainMenu, footer, header { visibility: hidden; }
+    background-color: {T['bg_main']} !important;
+    color: {T['text_main']} !important;
+}}
+.main {{ background-color: {T['bg_main']} !important; }}
+section[data-testid="stSidebar"] {{ 
+    background-color: {T['bg_card']} !important; 
+    border-right: 1px solid {T['border']} !important; 
+}}
+#MainMenu, footer, header {{ visibility: hidden; }}
 
 /* Top Header */
-.super-header {
-    background: linear-gradient(135deg, #0d1a26, #091520);
-    border-bottom: 1px solid #1e2d3d;
+.super-header {{
+    background: linear-gradient(135deg, {T['bg_card']}, {T['bg_main']});
+    border-bottom: 1px solid {T['border']};
     padding: 16px 24px; border-radius: 0 0 16px 16px;
     margin-bottom: 16px;
-}
-.super-logo {
+}}
+.super-logo {{
     font-family: 'Syne', sans-serif !important;
     font-size: 1.6rem; font-weight: 800;
-    background: linear-gradient(90deg, #00d4ff, #00ff88, #ff6b6b);
+    background: linear-gradient(90deg, {T['accent_cyan']}, {T['accent_green']}, {T['accent_orange']});
     -webkit-background-clip: text; -webkit-text-fill-color: transparent;
     letter-spacing: 3px;
-}
-.super-sub {
-    font-size: 9px; color: #3a5a7a;
+}}
+.super-sub {{
+    font-size: 9px; color: {T['text_dark']};
     letter-spacing: 3px; text-transform: uppercase;
-}
+}}
 
 /* Cards */
-.metric-card-super {
-    background: linear-gradient(135deg, #0d1a26, #111820) !important;
-    border: 1px solid #1e2d3d !important;
+.metric-card-super {{
+    background: linear-gradient(135deg, {T['bg_card']}, {T['bg_card_alt']}) !important;
+    border: 1px solid {T['border']} !important;
     border-radius: 12px !important;
     padding: 16px !important;
-    box-shadow: 0 4px 20px rgba(0,0,0,0.3) !important;
+    box-shadow: 0 4px 20px rgba(0,0,0,{'0.3' if is_dark else '0.08'}) !important;
     transition: all 0.3s ease;
-}
-.metric-card-super:hover {
-    border-color: #00d4ff55 !important;
+}}
+.metric-card-super:hover {{
+    border-color: {T['border_hover']} !important;
     transform: translateY(-2px);
-}
+}}
 
 /* Signal Cards */
-.card-strong-buy {
-    background: linear-gradient(135deg, #00ff8810, #00ff8805) !important;
-    border: 1px solid #00ff8840 !important;
+.card-strong-buy {{
+    background: linear-gradient(135deg, {T['accent_green']}10, {T['accent_green']}05) !important;
+    border: 1px solid {T['accent_green']}40 !important;
     border-radius: 12px !important;
     padding: 16px !important;
     margin: 8px 0 !important;
-}
-.card-buy {
-    background: linear-gradient(135deg, #00cc6610, #00cc6605) !important;
-    border: 1px solid #00cc6640 !important;
+}}
+.card-buy {{
+    background: linear-gradient(135deg, {T['accent_green']}10, {T['accent_green']}05) !important;
+    border: 1px solid {T['accent_green']}40 !important;
     border-radius: 12px !important;
     padding: 16px !important;
     margin: 8px 0 !important;
-}
-.card-strong-sell {
-    background: linear-gradient(135deg, #ff406010, #ff406005) !important;
-    border: 1px solid #ff406040 !important;
+}}
+.card-strong-sell {{
+    background: linear-gradient(135deg, {T['accent_red']}10, {T['accent_red']}05) !important;
+    border: 1px solid {T['accent_red']}40 !important;
     border-radius: 12px !important;
     padding: 16px !important;
     margin: 8px 0 !important;
-}
-.card-sell {
-    background: linear-gradient(135deg, #ff202010, #ff202005) !important;
-    border: 1px solid #ff202040 !important;
+}}
+.card-sell {{
+    background: linear-gradient(135deg, {T['accent_red']}10, {T['accent_red']}05) !important;
+    border: 1px solid {T['accent_red']}40 !important;
     border-radius: 12px !important;
     padding: 16px !important;
     margin: 8px 0 !important;
-}
+}}
 
 /* OI Buildup Badges */
-.badge-long-build {
-    background: linear-gradient(90deg, #00ff88, #00cc66) !important;
-    color: #000 !important; font-weight: 700 !important;
+.badge-long-build {{
+    background: linear-gradient(90deg, {T['accent_green']}, {T['accent_green']}) !important;
+    color: {'#000' if is_light else '#fff'} !important; font-weight: 700 !important;
     padding: 4px 12px !important; border-radius: 20px !important;
     font-size: 11px !important; letter-spacing: 1px !important;
-}
-.badge-short-build {
-    background: linear-gradient(90deg, #ff4060, #ff2020) !important;
+}}
+.badge-short-build {{
+    background: linear-gradient(90deg, {T['accent_red']}, {T['accent_red']}) !important;
     color: #fff !important; font-weight: 700 !important;
     padding: 4px 12px !important; border-radius: 20px !important;
     font-size: 11px !important; letter-spacing: 1px !important;
-}
-.badge-short-cover {
-    background: linear-gradient(90deg, #ffc700, #ffaa00) !important;
-    color: #000 !important; font-weight: 700 !important;
+}}
+.badge-short-cover {{
+    background: linear-gradient(90deg, {T['accent_yellow']}, {T['accent_yellow']}) !important;
+    color: {'#000' if is_light else '#000'} !important; font-weight: 700 !important;
     padding: 4px 12px !important; border-radius: 20px !important;
     font-size: 11px !important; letter-spacing: 1px !important;
-}
-.badge-long-unwind {
-    background: linear-gradient(90deg, #ff6b6b, #ff8e53) !important;
+}}
+.badge-long-unwind {{
+    background: linear-gradient(90deg, {T['accent_orange']}, {T['accent_orange']}) !important;
     color: #fff !important; font-weight: 700 !important;
     padding: 4px 12px !important; border-radius: 20px !important;
     font-size: 11px !important; letter-spacing: 1px !important;
-}
+}}
 
 /* Accuracy Badge */
-.acc-badge {
+.acc-badge {{
     display: inline-block; padding: 6px 16px;
     border-radius: 20px; font-weight: 700;
     font-size: 14px; letter-spacing: 1px;
-}
-.acc-90 { background: linear-gradient(90deg, #00ff88, #00cc66); color: #000; }
-.acc-80 { background: linear-gradient(90deg, #ffc700, #ffaa00); color: #000; }
-.acc-70 { background: linear-gradient(90deg, #ff6b6b, #ff4060); color: #fff; }
+}}
+.acc-90 {{ background: linear-gradient(90deg, {T['accent_green']}, {T['accent_green']}); color: {'#000' if is_light else '#000'}; }}
+.acc-80 {{ background: linear-gradient(90deg, {T['accent_yellow']}, {T['accent_yellow']}); color: {'#000' if is_light else '#000'}; }}
+.acc-70 {{ background: linear-gradient(90deg, {T['accent_orange']}, {T['accent_red']}); color: #fff; }}
 
 /* Buttons */
-.stButton > button {
-    background: linear-gradient(90deg, #00d4ff22, #00ff8822) !important;
-    color: #00d4ff !important; font-weight: 700 !important;
+.stButton > button {{
+    background: linear-gradient(90deg, {T['accent_cyan']}22, {T['accent_green']}22) !important;
+    color: {T['accent_cyan']} !important; font-weight: 700 !important;
     font-size: 12px !important; border-radius: 8px !important;
-    padding: 10px 24px !important; border: 1px solid #00d4ff44 !important;
+    padding: 10px 24px !important; border: 1px solid {T['accent_cyan']}44 !important;
     letter-spacing: 1px !important; font-family: 'JetBrains Mono', monospace !important;
     transition: all 0.2s !important;
-}
-.stButton > button:hover {
-    background: linear-gradient(90deg, #00d4ff, #00ff88) !important;
-    color: #000 !important; border-color: transparent !important;
-}
+}}
+.stButton > button:hover {{
+    background: linear-gradient(90deg, {T['accent_cyan']}, {T['accent_green']}) !important;
+    color: {'#000' if is_light else '#000'} !important; border-color: transparent !important;
+}}
 
 /* Tabs */
-.stTabs [data-baseweb="tab-list"] {
-    background: #0d1219 !important;
-    border-bottom: 1px solid #1e2d3d !important;
+.stTabs [data-baseweb="tab-list"] {{
+    background: {T['bg_card']} !important;
+    border-bottom: 1px solid {T['border']} !important;
     gap: 4px !important; padding: 0 8px !important;
     border-radius: 8px 8px 0 0 !important;
-}
-.stTabs [data-baseweb="tab"] {
-    background: transparent !important; color: #6a8aaa !important;
+}}
+.stTabs [data-baseweb="tab"] {{
+    background: transparent !important; color: {T['text_dim']} !important;
     border-radius: 6px 6px 0 0 !important; padding: 10px 20px !important;
     font-size: 11px !important; font-weight: 600 !important;
     letter-spacing: 1px !important; border: none !important;
-}
-.stTabs [aria-selected="true"] {
-    background: linear-gradient(135deg, #00d4ff15, #00ff8815) !important;
-    color: #00d4ff !important; border-bottom: 2px solid #00d4ff !important;
-}
+}}
+.stTabs [aria-selected="true"] {{
+    background: linear-gradient(135deg, {T['accent_cyan']}15, {T['accent_green']}15) !important;
+    color: {T['accent_cyan']} !important; border-bottom: 2px solid {T['accent_cyan']} !important;
+}}
 
 /* Inputs */
 .stTextInput > div > div > input, .stNumberInput > div > div > input,
-.stSelectbox > div > div, .stSlider > div {
-    background-color: #0d1219 !important; border: 1px solid #1e2d3d !important;
-    border-radius: 8px !important; color: #c8d8e8 !important;
+.stSelectbox > div > div, .stSlider > div {{
+    background-color: {T['bg_card']} !important; border: 1px solid {T['border']} !important;
+    border-radius: 8px !important; color: {T['text_main']} !important;
     font-family: 'JetBrains Mono', monospace !important; font-size: 12px !important;
-}
+}}
 
 /* DataFrames */
-.stDataFrame { border: 1px solid #1e2d3d !important; border-radius: 10px !important; overflow: hidden !important; }
-.stProgress > div > div > div { background: linear-gradient(90deg, #00d4ff, #00ff88) !important; border-radius: 4px !important; }
+.stDataFrame {{ border: 1px solid {T['border']} !important; border-radius: 10px !important; overflow: hidden !important; }}
+.stProgress > div > div > div {{ background: linear-gradient(90deg, {T['accent_cyan']}, {T['accent_green']}) !important; border-radius: 4px !important; }}
 
 /* Section Headers */
-.section-h {
+.section-h {{
     font-family: 'Syne', sans-serif !important; font-size: 1rem;
-    font-weight: 700; color: #00d4ff; letter-spacing: 2px;
-    text-transform: uppercase; border-left: 3px solid #00d4ff;
+    font-weight: 700; color: {T['accent_cyan']}; letter-spacing: 2px;
+    text-transform: uppercase; border-left: 3px solid {T['accent_cyan']};
     padding-left: 10px; margin: 16px 0 12px;
-}
+}}
 
 /* Filter Box */
-.filter-box-super {
-    background: #0d1219; border: 1px solid #1e2d3d;
+.filter-box-super {{
+    background: {T['bg_card']}; border: 1px solid {T['border']};
     border-radius: 8px; padding: 12px; margin: 4px 0;
     font-size: 12px;
-}
-.filter-pass { border-left: 3px solid #00ff88; }
-.filter-fail { border-left: 3px solid #ff4060; }
+}}
+.filter-pass {{ border-left: 3px solid {T['accent_green']}; }}
+.filter-fail {{ border-left: 3px solid {T['accent_red']}; }}
 
 /* OI Card */
-.oi-card-super {
-    background: linear-gradient(135deg, #111820, #0d1a26);
-    border: 1px solid #1e2d3d; border-radius: 10px;
+.oi-card-super {{
+    background: linear-gradient(135deg, {T['bg_card_alt']}, {T['bg_card']});
+    border: 1px solid {T['border']}; border-radius: 10px;
     padding: 12px; margin: 8px 0;
-}
-.oi-metric-val { font-size: 20px; font-weight: 700; color: #00d4ff; }
-.oi-metric-lbl { font-size: 10px; color: #6a8aaa; text-transform: uppercase; letter-spacing: 1px; }
+}}
+.oi-metric-val {{ font-size: 20px; font-weight: 700; color: {T['accent_cyan']}; }}
+.oi-metric-lbl {{ font-size: 10px; color: {T['text_dim']}; text-transform: uppercase; letter-spacing: 1px; }}
+
+/* Login Box */
+.login-box {{
+    max-width: 420px; margin: 100px auto;
+    background: linear-gradient(135deg, {T['bg_card']}, {T['bg_card_alt']}) !important;
+    border: 1px solid {T['border']} !important; border-radius: 20px;
+    padding: 50px; text-align: center;
+    box-shadow: 0 20px 60px rgba(0,0,0,{'0.5' if is_dark else '0.15'});
+}}
+
+/* Status badges */
+.status-open {{
+    background: {T['accent_green']}15 !important;
+    border: 1px solid {T['accent_green']}40 !important;
+    color: {T['accent_green']} !important;
+    border-radius: 6px; padding: 6px 14px;
+    font-size: 11px; font-weight: 700; letter-spacing: 1px;
+}}
+.status-closed {{
+    background: {T['accent_red']}15 !important;
+    border: 1px solid {T['accent_red']}40 !important;
+    color: {T['accent_red']} !important;
+    border-radius: 6px; padding: 6px 14px;
+    font-size: 11px; font-weight: 700; letter-spacing: 1px;
+}}
+
+/* Sector cards */
+.sector-card {{
+    background: linear-gradient(135deg, {T['bg_card']}, {T['bg_card_alt']}) !important;
+    border: 1px solid {T['border']} !important; border-radius: 10px;
+    padding: 12px; text-align: center;
+}}
+.sector-up {{ color: {T['accent_green']}; font-size: 18px; font-weight: 700; }}
+.sector-down {{ color: {T['accent_red']}; font-size: 18px; font-weight: 700; }}
+.sector-neutral {{ color: {T['accent_yellow']}; font-size: 18px; font-weight: 700; }}
+.sector-name {{ font-size: 11px; color: {T['text_dim']}; letter-spacing: 1px; }}
+.sector-trend {{ font-size: 9px; color: {T['text_dark']}; }}
+
+/* Skip box */
+.skip-box {{
+    background: {T['accent_yellow']}10 !important;
+    border: 1px solid {T['accent_yellow']}30 !important;
+    border-radius: 8px; padding: 10px 16px;
+    color: {T['accent_yellow']}; font-size: 11px;
+}}
+
+/* Chart setup */
+.candle-up {{ color: {T['candle_up']}; }}
+.candle-down {{ color: {T['candle_down']}; }}
 </style>
 """, unsafe_allow_html=True)
+
 
 # ============================================================
 # SIDEBAR
@@ -303,6 +396,27 @@ with st.sidebar:
         st.session_state.authenticated = False
         st.session_state.username = ""
         st.rerun()
+
+    st.markdown("---")
+
+    # THEME SELECTOR
+    st.markdown("<div class='section-h'>🎨 Theme</div>", unsafe_allow_html=True)
+    theme_cols = st.columns(3)
+    with theme_cols[0]:
+        if st.button("🌑 DARK", use_container_width=True, 
+                     type="primary" if st.session_state.theme == "DARK" else "secondary"):
+            st.session_state.theme = "DARK"
+            st.rerun()
+    with theme_cols[1]:
+        if st.button("☀️ LIGHT", use_container_width=True,
+                     type="primary" if st.session_state.theme == "LIGHT" else "secondary"):
+            st.session_state.theme = "LIGHT"
+            st.rerun()
+    with theme_cols[2]:
+        if st.button("🌓 MOD", use_container_width=True,
+                     type="primary" if st.session_state.theme == "MODERATE" else "secondary"):
+            st.session_state.theme = "MODERATE"
+            st.rerun()
 
     st.markdown("---")
     st.markdown("<div class='section-h'>Scanner Mode</div>", unsafe_allow_html=True)
@@ -396,11 +510,7 @@ st.markdown(f"""
       <div class="super-sub">ORB + OI SPURTS + VWAP + EMA · NSE INTRADAY LIVE</div>
     </div>
     <div style="display:flex;gap:12px;align-items:center;flex-wrap:wrap;">
-      <div style="background:{'#00ff8815' if open_status else '#ff406015'};
-                  border:1px solid {'#00ff8840' if open_status else '#ff406040'};
-                  border-radius:6px;padding:6px 14px;
-                  color:{'#00ff88' if open_status else '#ff4060'};
-                  font-size:11px;font-weight:700;letter-spacing:1px;">
+      <div class="{'status-open' if open_status else 'status-closed'}">
         {'🟢' if open_status else '🔴'} {market_msg}
       </div>
       <div style="color:#3a5a7a;font-size:10px;">⏰ {now_str}</div>
