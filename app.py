@@ -759,7 +759,7 @@ def get_sector_performance():
             sector_perf[sector] = {"change": 0, "trend": "NEUTRAL"}
     return sector_perf
 
-=====================
+# ============================================================
 # CORE ANALYSIS - ORB + 5 FILTERS + OI BUILDUP
 # ============================================================
 
