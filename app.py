@@ -372,6 +372,19 @@ with st.sidebar:
 # ============================================================
 # HEADER
 # ============================================================
+
+def is_market_open():
+    now = now_ist()
+    if now.weekday() >= 5:
+        return False, "Weekend — Market Closed"
+    if now.hour < 9 or (now.hour == 9 and now.minute < 15):
+        return False, "Pre-market (Opens 9:15 AM)"
+    if now.hour > 15 or (now.hour == 15 and now.minute > 30):
+        return False, "Market Closed (3:30 PM)"
+    return True, "Market Open"
+
+# =======================================
+
 open_status, market_msg = is_market_open()
 now_str = now_ist().strftime("%d %b %Y · %H:%M:%S IST")
 
@@ -746,17 +759,7 @@ def get_sector_performance():
             sector_perf[sector] = {"change": 0, "trend": "NEUTRAL"}
     return sector_perf
 
-def is_market_open():
-    now = now_ist()
-    if now.weekday() >= 5:
-        return False, "Weekend — Market Closed"
-    if now.hour < 9 or (now.hour == 9 and now.minute < 15):
-        return False, "Pre-market (Opens 9:15 AM)"
-    if now.hour > 15 or (now.hour == 15 and now.minute > 30):
-        return False, "Market Closed (3:30 PM)"
-    return True, "Market Open"
-
-# ============================================================
+=====================
 # CORE ANALYSIS - ORB + 5 FILTERS + OI BUILDUP
 # ============================================================
 
