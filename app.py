@@ -303,16 +303,26 @@ section[data-testid="stSidebar"] {{
 .filter-box-super {{
     background: {T['bg_card']}; border: 1px solid {T['border']};
     border-radius: 8px; padding: 12px; margin: 4px 0;
-    font-size: 12px;
+    font-size: 12px; color: {T['text_main']} !important;
 }}
-.filter-pass {{ border-left: 3px solid {T['accent_green']}; }}
-.filter-fail {{ border-left: 3px solid {T['accent_red']}; }}
+.filter-box-super b, .filter-box-super strong {{
+    color: {T['accent_cyan']} !important;
+}}
+.filter-pass {{ 
+    border-left: 3px solid {T['accent_green']}; 
+    background: linear-gradient(90deg, {T['accent_green']}08, {T['bg_card']}) !important;
+}}
+.filter-fail {{ 
+    border-left: 3px solid {T['accent_red']}; 
+    background: linear-gradient(90deg, {T['accent_red']}08, {T['bg_card']}) !important;
+}}
 
 /* OI Card */
 .oi-card-super {{
     background: linear-gradient(135deg, {T['bg_card_alt']}, {T['bg_card']});
     border: 1px solid {T['border']}; border-radius: 10px;
     padding: 12px; margin: 8px 0;
+    color: {T['text_main']} !important;
 }}
 .oi-metric-val {{ font-size: 20px; font-weight: 700; color: {T['accent_cyan']}; }}
 .oi-metric-lbl {{ font-size: 10px; color: {T['text_dim']}; text-transform: uppercase; letter-spacing: 1px; }}
@@ -365,6 +375,15 @@ section[data-testid="stSidebar"] {{
 /* Chart setup */
 .candle-up {{ color: {T['candle_up']}; }}
 .candle-down {{ color: {T['candle_down']}; }}
+
+/* Expander fixes */
+.streamlit-expanderHeader {{
+    color: {T['text_main']} !important;
+    font-size: 14px !important;
+}}
+.streamlit-expanderContent {{
+    background: {T['bg_main']} !important;
+}}
 </style>
 """, unsafe_allow_html=True)
 
@@ -1370,22 +1389,22 @@ def display_signal_card(result):
         st.markdown("<div class='section-h'>📈 Technicals</div>", unsafe_allow_html=True)
         tech_col1, tech_col2, tech_col3, tech_col4 = st.columns(4)
         with tech_col1:
-            st.markdown(f'<div class="filter-box-super">VWAP: {result["VWAP"]}<br><small>Value: ₹{result.get("vwap_val", "N/A")}</small></div>', unsafe_allow_html=True)
+            st.markdown(f'<div class="filter-box-super" style="color: {T["text_main"]};"><b style="color: {T["accent_cyan"]};">VWAP:</b> {result["VWAP"]}<br><small style="color: {T["text_dim"]};">Value: ₹{result.get("vwap_val", "N/A")}</small></div>', unsafe_allow_html=True)
         with tech_col2:
-            st.markdown(f'<div class="filter-box-super">EMA: {result["EMA TREND"]}<br><small>Value: ₹{result.get("ema20_val", "N/A")}</small></div>', unsafe_allow_html=True)
+            st.markdown(f'<div class="filter-box-super" style="color: {T["text_main"]};"><b style="color: {T["accent_cyan"]};">EMA:</b> {result["EMA TREND"]}<br><small style="color: {T["text_dim"]};">Value: ₹{result.get("ema20_val", "N/A")}</small></div>', unsafe_allow_html=True)
         with tech_col3:
-            st.markdown(f'<div class="filter-box-super">Volume: {result["VOL RATIO"]}<br><small>vs Previous Day</small></div>', unsafe_allow_html=True)
+            st.markdown(f'<div class="filter-box-super" style="color: {T["text_main"]};"><b style="color: {T["accent_cyan"]};">Volume:</b> {result["VOL RATIO"]}<br><small style="color: {T["text_dim"]};">vs Previous Day</small></div>', unsafe_allow_html=True)
         with tech_col4:
-            st.markdown(f'<div class="filter-box-super">ATR: ₹{result.get("atr", "N/A")}<br><small>Gap: {result.get("gap_pct", 0)}%</small></div>', unsafe_allow_html=True)
+            st.markdown(f'<div class="filter-box-super" style="color: {T["text_main"]};"><b style="color: {T["accent_cyan"]};">ATR:</b> ₹{result.get("atr", "N/A")}<br><small style="color: {T["text_dim"]};">Gap: {result.get("gap_pct", 0)}%</small></div>', unsafe_allow_html=True)
 
         # Filter Details
         st.markdown("<div class='section-h'>📋 Filter Analysis</div>", unsafe_allow_html=True)
         filter_details = result.get('filter_details', [])
         for name, passed, detail in filter_details:
             if passed:
-                st.markdown(f'<div class="filter-box-super filter-pass">✅ <b>{name}</b> — {detail}</div>', unsafe_allow_html=True)
+                st.markdown(f'<div class="filter-box-super filter-pass" style="color: {T["text_main"]};">✅ <b style="color: {T["accent_cyan"]};">{name}</b> — <span style="color: {T["text_dim"]};">{detail}</span></div>', unsafe_allow_html=True)
             else:
-                st.markdown(f'<div class="filter-box-super filter-fail">❌ <b>{name}</b> — {detail}</div>', unsafe_allow_html=True)
+                st.markdown(f'<div class="filter-box-super filter-fail" style="color: {T["text_main"]};">❌ <b style="color: {T["accent_red"]};">{name}</b> — <span style="color: {T["text_dim"]};">{detail}</span></div>', unsafe_allow_html=True)
 
         # Add to Journal button
         if st.button(f"📝 Add {result['STOCK']} to Journal", key=f"journal_{result['STOCK']}"):
