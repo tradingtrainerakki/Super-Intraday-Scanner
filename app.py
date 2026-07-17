@@ -1140,6 +1140,168 @@ iframe {
         color: #e8f0f8 !important;
     }
 }
+
+/* ============================================
+   ACTIVE/FOCUS/SELECTED STATE FIXES
+   Prevent white flash on click
+   ============================================ */
+
+/* All interactive elements - active state */
+*:active {
+    background-color: transparent !important;
+    color: inherit !important;
+}
+
+/* Focus visible (keyboard navigation) */
+*:focus-visible {
+    outline: 2px solid #00d4ff60 !important;
+    outline-offset: 2px !important;
+    background-color: transparent !important;
+}
+
+/* Target state (URL hash) */
+*:target {
+    background-color: transparent !important;
+}
+
+/* Streamlit expander - all states */
+.streamlit-expander:active,
+.streamlit-expander:focus,
+.streamlit-expander:focus-within {
+    background-color: #0d1a26 !important;
+    border-color: #00d4ff55 !important;
+}
+
+.streamlit-expanderHeader:active,
+.streamlit-expanderHeader:focus,
+.streamlit-expanderHeader:focus-visible {
+    background-color: #1a2436 !important;
+    color: #00d4ff !important;
+    outline: none !important;
+}
+
+/* Streamlit buttons - active state */
+.stButton > button:active,
+.stButton > button:focus,
+.stButton > button:focus-visible {
+    background: linear-gradient(90deg, #00d4ff, #00ff88) !important;
+    color: #000 !important;
+    box-shadow: 0 0 0 3px #00d4ff40 !important;
+    outline: none !important;
+}
+
+/* Input fields - focus state */
+.stTextInput > div > div > input:focus,
+.stNumberInput > div > div > input:focus,
+.stTextArea > div > div > textarea:focus,
+.stSelectbox > div > div:focus,
+.stDateInput > div > div > input:focus,
+.stTimeInput > div > div > input:focus {
+    background-color: #0d1a26 !important;
+    border-color: #00d4ff !important;
+    box-shadow: 0 0 0 3px #00d4ff30 !important;
+    color: #e8f0f8 !important;
+    outline: none !important;
+}
+
+/* Checkbox - checked state */
+.stCheckbox input:checked + div {
+    background-color: #00ff88 !important;
+    border-color: #00ff88 !important;
+}
+.stCheckbox input:checked + div > div {
+    background-color: #000 !important;
+}
+
+/* Radio - selected state */
+.stRadio input:checked + div {
+    background-color: #00d4ff !important;
+    border-color: #00d4ff !important;
+}
+.stRadio input:checked + div > div {
+    background-color: #000 !important;
+}
+
+/* Selectbox dropdown - open state */
+.stSelectbox > div > div[aria-expanded="true"] {
+    background-color: #0d1a26 !important;
+    border-color: #00d4ff !important;
+}
+
+/* Slider - thumb active */
+.stSlider > div > div > div > div[role="slider"]:active,
+.stSlider > div > div > div > div[role="slider"]:focus {
+    background-color: #00d4ff !important;
+    box-shadow: 0 0 0 4px #00d4ff40 !important;
+}
+
+/* DataFrame - selected row */
+[data-testid="stDataFrame"] tr[aria-selected="true"] td {
+    background-color: #1a2436 !important;
+    color: #00d4ff !important;
+}
+
+/* Tabs - active/selected */
+.stTabs [aria-selected="true"]:active,
+.stTabs [aria-selected="true"]:focus {
+    background: linear-gradient(135deg, #00d4ff20, #00ff8820) !important;
+    border-bottom: 2px solid #00d4ff !important;
+    color: #00d4ff !important;
+    outline: none !important;
+}
+
+/* Any element that gets clicked - prevent white */
+[data-testid]:active,
+[data-testid]:focus {
+    background-color: transparent !important;
+}
+
+/* Specific fix for sidebar elements */
+section[data-testid="stSidebar"] *:active,
+section[data-testid="stSidebar"] *:focus {
+    background-color: transparent !important;
+    color: inherit !important;
+}
+
+/* Expander icon/button */
+.streamlit-expanderHeader > div:last-child:active,
+.streamlit-expanderHeader > div:last-child:focus {
+    background-color: transparent !important;
+    color: #00d4ff !important;
+}
+
+/* Prevent any white background from Streamlit's default styles */
+[class*="st-"]:active,
+[class*="st-"]:focus,
+[class*="st-"]:focus-within,
+[class*="st-"]:focus-visible {
+    background-color: transparent !important;
+}
+
+/* Ensure all pseudo-elements are dark */
+::before,
+::after {
+    background-color: transparent !important;
+    color: inherit !important;
+}
+
+/* Fix for any element that might flash white during transition */
+* {
+    -webkit-tap-highlight-color: transparent !important;
+    -webkit-focus-ring-color: transparent !important;
+}
+
+/* Specific fix for the expander chevron/arrow icon */
+.streamlit-expanderHeader svg {
+    color: #6a8aaa !important;
+    fill: #6a8aaa !important;
+}
+.streamlit-expanderHeader:hover svg,
+.streamlit-expanderHeader:active svg,
+.streamlit-expanderHeader:focus svg {
+    color: #00d4ff !important;
+    fill: #00d4ff !important;
+}
 </style>
 """, unsafe_allow_html=True)
 
