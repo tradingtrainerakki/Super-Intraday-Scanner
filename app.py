@@ -722,6 +722,428 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # ============================================================
+# STREAMLIT COMPONENT COLOR OVERRIDES
+# ============================================================
+st.markdown("""
+<style>
+/* ============================================
+   STREAMLIT DEFAULT COMPONENT OVERRIDES
+   ============================================ */
+
+/* Expander */
+.streamlit-expander {
+    background-color: #0d1a26 !important;
+    border: 1px solid #1e2d3d !important;
+    border-radius: 10px !important;
+}
+.streamlit-expanderHeader {
+    background-color: #0d1a26 !important;
+    color: #e8f0f8 !important;
+    font-weight: 600 !important;
+    font-size: 13px !important;
+}
+.streamlit-expanderHeader:hover {
+    background-color: #1a2436 !important;
+    color: #00d4ff !important;
+}
+.streamlit-expanderContent {
+    background-color: #080c12 !important;
+    color: #e8f0f8 !important;
+}
+
+/* Success message */
+.stSuccess {
+    background-color: #00ff8815 !important;
+    border: 1px solid #00ff8840 !important;
+    color: #00ff88 !important;
+    border-radius: 8px !important;
+    padding: 12px 16px !important;
+}
+.stSuccess > div {
+    color: #00ff88 !important;
+}
+
+/* Info message */
+.stInfo {
+    background-color: #00d4ff15 !important;
+    border: 1px solid #00d4ff40 !important;
+    color: #00d4ff !important;
+    border-radius: 8px !important;
+    padding: 12px 16px !important;
+}
+.stInfo > div {
+    color: #00d4ff !important;
+}
+
+/* Warning message */
+.stWarning {
+    background-color: #ffc70015 !important;
+    border: 1px solid #ffc70040 !important;
+    color: #ffc700 !important;
+    border-radius: 8px !important;
+    padding: 12px 16px !important;
+}
+.stWarning > div {
+    color: #ffc700 !important;
+}
+
+/* Error message */
+.stError {
+    background-color: #ff406015 !important;
+    border: 1px solid #ff406040 !important;
+    color: #ff4060 !important;
+    border-radius: 8px !important;
+    padding: 12px 16px !important;
+}
+.stError > div {
+    color: #ff4060 !important;
+}
+
+/* Caption */
+.stCaption {
+    color: #6a8aaa !important;
+    font-size: 11px !important;
+}
+.stCaption > div {
+    color: #6a8aaa !important;
+}
+
+/* Text input placeholder */
+.stTextInput > div > div > input::placeholder {
+    color: #3a5a7a !important;
+}
+
+/* Number input placeholder */
+.stNumberInput > div > div > input::placeholder {
+    color: #3a5a7a !important;
+}
+
+/* Selectbox placeholder */
+.stSelectbox > div > div > div {
+    color: #e8f0f8 !important;
+}
+
+/* Slider */
+.stSlider > div > div > div {
+    color: #e8f0f8 !important;
+}
+
+/* Checkbox label */
+.stCheckbox > label > span {
+    color: #e8f0f8 !important;
+}
+
+/* Radio label */
+.stRadio > div > label > div {
+    color: #e8f0f8 !important;
+}
+.stRadio > div > label > div:hover {
+    color: #00d4ff !important;
+}
+
+/* Markdown text */
+.stMarkdown {
+    color: #e8f0f8 !important;
+}
+.stMarkdown p {
+    color: #e8f0f8 !important;
+}
+.stMarkdown h1, .stMarkdown h2, .stMarkdown h3 {
+    color: #00d4ff !important;
+}
+
+/* Metric */
+[data-testid="stMetricValue"] {
+    color: #e8f0f8 !important;
+    font-weight: 700 !important;
+}
+[data-testid="stMetricLabel"] {
+    color: #6a8aaa !important;
+    font-size: 11px !important;
+}
+[data-testid="stMetricDelta"] {
+    color: #00ff88 !important;
+    font-size: 12px !important;
+}
+
+/* DataFrame */
+[data-testid="stDataFrame"] {
+    background: #0d1a26 !important;
+    border: 1px solid #1e2d3d !important;
+    border-radius: 10px !important;
+}
+[data-testid="stDataFrame"] th {
+    background: #111820 !important;
+    color: #6a8aaa !important;
+    font-size: 10px !important;
+    letter-spacing: 2px !important;
+    text-transform: uppercase !important;
+    border-bottom: 2px solid #1e2d3d !important;
+    padding: 10px 12px !important;
+}
+[data-testid="stDataFrame"] td {
+    background: #0d1a26 !important;
+    color: #e8f0f8 !important;
+    border-bottom: 1px solid #1e2d3d !important;
+    padding: 10px 12px !important;
+    font-size: 12px !important;
+}
+[data-testid="stDataFrame"] tr:hover td {
+    background: #1a2436 !important;
+    color: #e8f0f8 !important;
+}
+
+/* Progress bar */
+.stProgress > div > div > div {
+    background: linear-gradient(90deg, #00d4ff, #00ff88) !important;
+    border-radius: 4px !important;
+}
+
+/* Spinner */
+.stSpinner > div {
+    border-color: #00d4ff !important;
+}
+
+/* Toast/Notification */
+.toast {
+    background: #0d1a26 !important;
+    border: 1px solid #1e2d3d !important;
+    color: #e8f0f8 !important;
+}
+
+/* Tooltip */
+.tooltip {
+    background: #0d1a26 !important;
+    border: 1px solid #1e2d3d !important;
+    color: #e8f0f8 !important;
+}
+
+/* Dialog/Modal */
+.dialog {
+    background: #0d1a26 !important;
+    border: 1px solid #1e2d3d !important;
+    color: #e8f0f8 !important;
+}
+
+/* Button (all states) */
+.stButton > button:active {
+    background: linear-gradient(90deg, #00d4ff, #00ff88) !important;
+    color: #000 !important;
+}
+.stButton > button:focus {
+    box-shadow: 0 0 0 2px #00d4ff50 !important;
+}
+
+/* Select slider */
+.stSelectSlider > div > div {
+    color: #e8f0f8 !important;
+}
+
+/* File uploader */
+.stFileUploader > div {
+    background: #0d1a26 !important;
+    border: 1px solid #1e2d3d !important;
+    color: #e8f0f8 !important;
+}
+
+/* Color picker */
+.stColorPicker > div {
+    background: #0d1a26 !important;
+    border: 1px solid #1e2d3d !important;
+}
+
+/* Date input */
+.stDateInput > div > div > input {
+    background: #0d1a26 !important;
+    border: 1px solid #1e2d3d !important;
+    color: #e8f0f8 !important;
+}
+
+/* Time input */
+.stTimeInput > div > div > input {
+    background: #0d1a26 !important;
+    border: 1px solid #1e2d3d !important;
+    color: #e8f0f8 !important;
+}
+
+/* Text area */
+.stTextArea > div > div > textarea {
+    background: #0d1a26 !important;
+    border: 1px solid #1e2d3d !important;
+    color: #e8f0f8 !important;
+}
+
+/* Code block */
+.stCodeBlock {
+    background: #111820 !important;
+    border: 1px solid #1e2d3d !important;
+    color: #00ff88 !important;
+}
+
+/* Divider */
+hr {
+    border-color: #1e2d3d !important;
+    border-width: 1px !important;
+}
+
+/* Link */
+a {
+    color: #00d4ff !important;
+    text-decoration: none !important;
+}
+a:hover {
+    color: #00ff88 !important;
+    text-decoration: underline !important;
+}
+
+/* List items */
+li {
+    color: #e8f0f8 !important;
+}
+
+/* Bold text */
+strong, b {
+    color: #00d4ff !important;
+    font-weight: 700 !important;
+}
+
+/* Italic text */
+em, i {
+    color: #a0b8d0 !important;
+}
+
+/* Blockquote */
+blockquote {
+    border-left: 3px solid #00d4ff !important;
+    background: #0d1a26 !important;
+    color: #e8f0f8 !important;
+    padding: 12px 16px !important;
+    border-radius: 0 8px 8px 0 !important;
+}
+
+/* Table (non-DataFrame) */
+table {
+    border: 1px solid #1e2d3d !important;
+    border-radius: 8px !important;
+}
+th {
+    background: #111820 !important;
+    color: #6a8aaa !important;
+    border-bottom: 2px solid #1e2d3d !important;
+}
+td {
+    background: #0d1a26 !important;
+    color: #e8f0f8 !important;
+    border-bottom: 1px solid #1e2d3d !important;
+}
+
+/* Image caption */
+figcaption {
+    color: #6a8aaa !important;
+    font-size: 11px !important;
+}
+
+/* Audio/Video player */
+audio, video {
+    background: #0d1a26 !important;
+    border-radius: 8px !important;
+}
+
+/* Iframe */
+iframe {
+    border: 1px solid #1e2d3d !important;
+    border-radius: 8px !important;
+}
+
+/* JSON/Code display */
+.json-display {
+    background: #111820 !important;
+    border: 1px solid #1e2d3d !important;
+    color: #00ff88 !important;
+    border-radius: 8px !important;
+    padding: 12px !important;
+}
+
+/* Status indicators */
+.status-indicator {
+    color: #e8f0f8 !important;
+}
+.status-indicator-success {
+    color: #00ff88 !important;
+}
+.status-indicator-error {
+    color: #ff4060 !important;
+}
+.status-indicator-warning {
+    color: #ffc700 !important;
+}
+.status-indicator-info {
+    color: #00d4ff !important;
+}
+
+/* Help tooltip icon */
+.stTooltipIcon {
+    color: #6a8aaa !important;
+}
+.stTooltipIcon:hover {
+    color: #00d4ff !important;
+}
+
+/* Empty state */
+.empty-state {
+    color: #6a8aaa !important;
+    background: #0d1a26 !important;
+    border: 1px solid #1e2d3d !important;
+    border-radius: 12px !important;
+    padding: 40px !important;
+    text-align: center !important;
+}
+
+/* Loading state */
+.loading-state {
+    color: #00d4ff !important;
+}
+
+/* Skeleton loader */
+.skeleton {
+    background: linear-gradient(90deg, #0d1a26, #1a2436, #0d1a26) !important;
+    background-size: 200% 100% !important;
+}
+
+/* Animation for smooth transitions */
+* {
+    transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease !important;
+}
+
+/* Focus states */
+*:focus {
+    outline: none !important;
+    box-shadow: 0 0 0 2px #00d4ff40 !important;
+}
+
+/* Selection color */
+::selection {
+    background: #00d4ff33 !important;
+    color: #e8f0f8 !important;
+}
+
+/* Scrollbar (universal) */
+* {
+    scrollbar-width: thin !important;
+    scrollbar-color: #1e2d3d #0d1a26 !important;
+}
+
+/* Print styles (dark mode friendly) */
+@media print {
+    body {
+        background: #080c12 !important;
+        color: #e8f0f8 !important;
+    }
+}
+</style>
+""", unsafe_allow_html=True)
+
+# ============================================================
 # SIDEBAR
 # ============================================================
 with st.sidebar:
