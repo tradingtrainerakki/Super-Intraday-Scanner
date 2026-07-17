@@ -675,6 +675,99 @@ section[data-testid="stSidebar"] * {{
 ::-webkit-scrollbar-thumb:hover {{
     background: {accent_cyan};
 }}
+
+/* ============================================
+   HOVER FIXES - Prevent white background
+   ============================================ */
+/* Streamlit expander hover */
+.streamlit-expanderHeader:hover {
+    background: var(--bg-card) !important;
+    color: var(--text-primary) !important;
+}
+
+/* Dataframe row hover */
+[data-testid="stDataFrame"] tr:hover {
+    background: #1a2436 !important;
+}
+
+/* Card hover effects */
+.metric-card-super:hover {
+    background: linear-gradient(135deg, #1a2436, #162030) !important;
+    border-color: #00d4ff55 !important;
+}
+
+/* Any element hover - prevent white flash */
+*::selection {
+    background: #00d4ff33 !important;
+    color: #e8f0f8 !important;
+}
+
+/* Streamlit specific hover fixes */
+[data-testid="stVerticalBlock"] > div:hover {
+    background: transparent !important;
+}
+
+/* Prevent white background on all interactive elements */
+button:hover, 
+.stButton > button:hover,
+.stCheckbox > label:hover,
+.stRadio > label:hover,
+.stSelectbox > div:hover,
+.stSlider > div:hover {
+    background: transparent !important;
+}
+
+/* Expander content hover */
+.streamlit-expanderContent:hover {
+    background: #080c12 !important;
+}
+
+/* Table/Dataframe hover rows */
+.stDataFrame tbody tr:hover {
+    background-color: #0d1a26 !important;
+    color: #e8f0f8 !important;
+}
+
+/* Sidebar hover */
+section[data-testid="stSidebar"] .stButton > button:hover {
+    background: linear-gradient(90deg, #00d4ff33, #00ff8833) !important;
+}
+
+/* ============================================
+   EXPANDER HOVER - CRITICAL FIX
+   ============================================ */
+.streamlit-expander {
+    background: #0d1a26 !important;
+    border: 1px solid #1e2d3d !important;
+    border-radius: 12px !important;
+    margin: 8px 0 !important;
+}
+
+.streamlit-expander:hover {
+    background: #1a2436 !important;
+    border-color: #00d4ff55 !important;
+}
+
+.streamlit-expanderHeader {
+    background: #0d1a26 !important;
+    color: #e8f0f8 !important;
+    border-radius: 12px !important;
+    padding: 16px !important;
+    font-weight: 600 !important;
+    transition: all 0.2s ease !important;
+}
+
+.streamlit-expanderHeader:hover {
+    background: #1a2436 !important;
+    color: #00d4ff !important;
+}
+
+.streamlit-expanderContent {
+    background: #080c12 !important;
+    color: #e8f0f8 !important;
+    border-top: 1px solid #1e2d3d !important;
+    padding: 16px !important;
+}
 </style>
 """, unsafe_allow_html=True)
 
@@ -839,7 +932,7 @@ st.markdown(f"""
       <div class="{'status-open' if open_status else 'status-closed'}">
         {'🟢' if open_status else '🔴'} {market_msg}
       </div>
-      <div style="color:#3a5a7a;font-size:10px;">⏰ {now_str}</div>
+      <div style="color:#6a8aaa;font-size:13px;font-weight:600;letter-spacing:1px;">⏰ {now_str}</div>
     </div>
   </div>
 </div>
