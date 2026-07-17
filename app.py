@@ -128,264 +128,556 @@ THEMES = {
 }
 
 
+
 # Apply dynamic theme CSS
 T = THEMES[st.session_state.theme]
 is_dark = st.session_state.theme in ["DARK", "MODERATE"]
 is_light = st.session_state.theme == "LIGHT"
 
+# Determine text colors based on theme
+if is_dark:
+    text_primary = "#e8f0f8"      # Very light blue-white
+    text_secondary = "#a0b8d0"   # Light blue-gray
+    text_muted = "#6a8aaa"       # Medium blue-gray
+    text_dark = "#3a5a7a"         # Dark blue-gray
+    bg_primary = T['bg_main']     # Main background
+    bg_card = T['bg_card']        # Card background
+    bg_card_alt = T['bg_card_alt'] # Alt card background
+    border_color = T['border']
+    accent_cyan = "#00d4ff"
+    accent_green = "#00ff88"
+    accent_red = "#ff4060"
+    accent_orange = "#ff6b6b"
+    accent_yellow = "#ffc700"
+    candle_up = "#00ff88"
+    candle_down = "#ff4060"
+    shadow = "0 4px 20px rgba(0,0,0,0.4)"
+    btn_text = "#000000"
+    badge_text_light = "#000000"
+    badge_text_dark = "#ffffff"
+else:
+    text_primary = "#1a2332"      # Very dark blue
+    text_secondary = "#3a4a5a"    # Dark gray-blue
+    text_muted = "#6a7a8a"       # Medium gray
+    text_dark = "#9aaab8"         # Light gray
+    bg_primary = T['bg_main']
+    bg_card = T['bg_card']
+    bg_card_alt = T['bg_card_alt']
+    border_color = T['border']
+    accent_cyan = "#0066cc"
+    accent_green = "#00aa44"
+    accent_red = "#cc2244"
+    accent_orange = "#dd5533"
+    accent_yellow = "#cc8800"
+    candle_up = "#00aa44"
+    candle_down = "#cc2244"
+    shadow = "0 4px 20px rgba(0,0,0,0.1)"
+    btn_text = "#ffffff"
+    badge_text_light = "#000000"
+    badge_text_dark = "#ffffff"
+
 st.markdown(f"""
 <style>
 @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Syne:wght@700;800&display=swap');
-html, body, [class*="css"] {{
-    font-family: 'JetBrains Mono', monospace !important;
-    background-color: {T['bg_main']} !important;
-    color: {T['text_main']} !important;
-}}
-.main {{ background-color: {T['bg_main']} !important; }}
-section[data-testid="stSidebar"] {{ 
-    background-color: {T['bg_card']} !important; 
-    border-right: 1px solid {T['border']} !important; 
-}}
-#MainMenu, footer, header {{ visibility: hidden; }}
 
-/* Top Header */
+/* ============================================
+   ROOT & BASE STYLES - HIGHEST SPECIFICITY
+   ============================================ */
+html, body, .stApp, [data-testid="stAppViewContainer"], 
+[data-testid="stVerticalBlock"], [data-testid="stHorizontalBlock"] {{
+    background-color: {bg_primary} !important;
+    color: {text_primary} !important;
+    font-family: 'JetBrains Mono', monospace !important;
+}}
+
+/* Force all text elements */
+.stApp * {{
+    color: {text_primary};
+}}
+
+/* Streamlit sidebar */
+section[data-testid="stSidebar"] {{ 
+    background-color: {bg_card} !important; 
+    border-right: 1px solid {border_color} !important;
+}}
+section[data-testid="stSidebar"] * {{
+    color: {text_primary} !important;
+}}
+
+/* Hide default menus */
+#MainMenu, footer, header {{ visibility: hidden !important; }}
+
+/* ============================================
+   HEADER
+   ============================================ */
 .super-header {{
-    background: linear-gradient(135deg, {T['bg_card']}, {T['bg_main']});
-    border-bottom: 1px solid {T['border']};
-    padding: 16px 24px; border-radius: 0 0 16px 16px;
+    background: linear-gradient(135deg, {bg_card}, {bg_primary});
+    border-bottom: 1px solid {border_color};
+    padding: 16px 24px; 
+    border-radius: 0 0 16px 16px;
     margin-bottom: 16px;
 }}
 .super-logo {{
     font-family: 'Syne', sans-serif !important;
     font-size: 1.6rem; font-weight: 800;
-    background: linear-gradient(90deg, {T['accent_cyan']}, {T['accent_green']}, {T['accent_orange']});
+    background: linear-gradient(90deg, {accent_cyan}, {accent_green}, {accent_orange});
     -webkit-background-clip: text; -webkit-text-fill-color: transparent;
     letter-spacing: 3px;
 }}
 .super-sub {{
-    font-size: 9px; color: {T['text_dark']};
+    font-size: 9px; color: {text_muted};
     letter-spacing: 3px; text-transform: uppercase;
 }}
 
-/* Cards */
+/* ============================================
+   METRIC CARDS
+   ============================================ */
 .metric-card-super {{
-    background: linear-gradient(135deg, {T['bg_card']}, {T['bg_card_alt']}) !important;
-    border: 1px solid {T['border']} !important;
+    background: linear-gradient(135deg, {bg_card}, {bg_card_alt}) !important;
+    border: 1px solid {border_color} !important;
     border-radius: 12px !important;
     padding: 16px !important;
-    box-shadow: 0 4px 20px rgba(0,0,0,{'0.3' if is_dark else '0.08'}) !important;
+    box-shadow: {shadow} !important;
     transition: all 0.3s ease;
 }}
 .metric-card-super:hover {{
-    border-color: {T['border_hover']} !important;
+    border-color: {accent_cyan}55 !important;
     transform: translateY(-2px);
 }}
 
-/* Signal Cards */
+/* ============================================
+   SIGNAL CARDS
+   ============================================ */
 .card-strong-buy {{
-    background: linear-gradient(135deg, {T['accent_green']}10, {T['accent_green']}05) !important;
-    border: 1px solid {T['accent_green']}40 !important;
+    background: linear-gradient(135deg, {accent_green}18, {accent_green}08) !important;
+    border: 1px solid {accent_green}60 !important;
     border-radius: 12px !important;
     padding: 16px !important;
     margin: 8px 0 !important;
 }}
 .card-buy {{
-    background: linear-gradient(135deg, {T['accent_green']}10, {T['accent_green']}05) !important;
-    border: 1px solid {T['accent_green']}40 !important;
+    background: linear-gradient(135deg, {accent_green}12, {accent_green}05) !important;
+    border: 1px solid {accent_green}50 !important;
     border-radius: 12px !important;
     padding: 16px !important;
     margin: 8px 0 !important;
 }}
 .card-strong-sell {{
-    background: linear-gradient(135deg, {T['accent_red']}10, {T['accent_red']}05) !important;
-    border: 1px solid {T['accent_red']}40 !important;
+    background: linear-gradient(135deg, {accent_red}18, {accent_red}08) !important;
+    border: 1px solid {accent_red}60 !important;
     border-radius: 12px !important;
     padding: 16px !important;
     margin: 8px 0 !important;
 }}
 .card-sell {{
-    background: linear-gradient(135deg, {T['accent_red']}10, {T['accent_red']}05) !important;
-    border: 1px solid {T['accent_red']}40 !important;
+    background: linear-gradient(135deg, {accent_red}12, {accent_red}05) !important;
+    border: 1px solid {accent_red}50 !important;
     border-radius: 12px !important;
     padding: 16px !important;
     margin: 8px 0 !important;
 }}
 
-/* OI Buildup Badges */
+/* ============================================
+   OI BADGES
+   ============================================ */
 .badge-long-build {{
-    background: linear-gradient(90deg, {T['accent_green']}, {T['accent_green']}) !important;
-    color: {'#000' if is_light else '#fff'} !important; font-weight: 700 !important;
-    padding: 4px 12px !important; border-radius: 20px !important;
-    font-size: 11px !important; letter-spacing: 1px !important;
+    background: linear-gradient(90deg, {accent_green}, {accent_green}) !important;
+    color: {badge_text_light} !important; 
+    font-weight: 700 !important;
+    padding: 4px 12px !important; 
+    border-radius: 20px !important;
+    font-size: 11px !important; 
+    letter-spacing: 1px !important;
+    display: inline-block;
 }}
 .badge-short-build {{
-    background: linear-gradient(90deg, {T['accent_red']}, {T['accent_red']}) !important;
-    color: #fff !important; font-weight: 700 !important;
-    padding: 4px 12px !important; border-radius: 20px !important;
-    font-size: 11px !important; letter-spacing: 1px !important;
+    background: linear-gradient(90deg, {accent_red}, {accent_red}) !important;
+    color: {badge_text_dark} !important; 
+    font-weight: 700 !important;
+    padding: 4px 12px !important; 
+    border-radius: 20px !important;
+    font-size: 11px !important; 
+    letter-spacing: 1px !important;
+    display: inline-block;
 }}
 .badge-short-cover {{
-    background: linear-gradient(90deg, {T['accent_yellow']}, {T['accent_yellow']}) !important;
-    color: {'#000' if is_light else '#000'} !important; font-weight: 700 !important;
-    padding: 4px 12px !important; border-radius: 20px !important;
-    font-size: 11px !important; letter-spacing: 1px !important;
+    background: linear-gradient(90deg, {accent_yellow}, {accent_yellow}) !important;
+    color: {badge_text_light} !important; 
+    font-weight: 700 !important;
+    padding: 4px 12px !important; 
+    border-radius: 20px !important;
+    font-size: 11px !important; 
+    letter-spacing: 1px !important;
+    display: inline-block;
 }}
 .badge-long-unwind {{
-    background: linear-gradient(90deg, {T['accent_orange']}, {T['accent_orange']}) !important;
-    color: #fff !important; font-weight: 700 !important;
-    padding: 4px 12px !important; border-radius: 20px !important;
-    font-size: 11px !important; letter-spacing: 1px !important;
+    background: linear-gradient(90deg, {accent_orange}, {accent_orange}) !important;
+    color: {badge_text_dark} !important; 
+    font-weight: 700 !important;
+    padding: 4px 12px !important; 
+    border-radius: 20px !important;
+    font-size: 11px !important; 
+    letter-spacing: 1px !important;
+    display: inline-block;
 }}
 
-/* Accuracy Badge */
+/* ============================================
+   ACCURACY BADGES
+   ============================================ */
 .acc-badge {{
-    display: inline-block; padding: 6px 16px;
-    border-radius: 20px; font-weight: 700;
-    font-size: 14px; letter-spacing: 1px;
+    display: inline-block; 
+    padding: 6px 16px;
+    border-radius: 20px; 
+    font-weight: 700;
+    font-size: 14px; 
+    letter-spacing: 1px;
 }}
-.acc-90 {{ background: linear-gradient(90deg, {T['accent_green']}, {T['accent_green']}); color: {'#000' if is_light else '#000'}; }}
-.acc-80 {{ background: linear-gradient(90deg, {T['accent_yellow']}, {T['accent_yellow']}); color: {'#000' if is_light else '#000'}; }}
-.acc-70 {{ background: linear-gradient(90deg, {T['accent_orange']}, {T['accent_red']}); color: #fff; }}
+.acc-90 {{ 
+    background: linear-gradient(90deg, {accent_green}, {accent_green}) !important; 
+    color: {badge_text_light} !important; 
+}}
+.acc-80 {{ 
+    background: linear-gradient(90deg, {accent_yellow}, {accent_yellow}) !important; 
+    color: {badge_text_light} !important; 
+}}
+.acc-70 {{ 
+    background: linear-gradient(90deg, {accent_orange}, {accent_red}) !important; 
+    color: #ffffff !important; 
+}}
 
-/* Buttons */
+/* ============================================
+   BUTTONS
+   ============================================ */
 .stButton > button {{
-    background: linear-gradient(90deg, {T['accent_cyan']}22, {T['accent_green']}22) !important;
-    color: {T['accent_cyan']} !important; font-weight: 700 !important;
-    font-size: 12px !important; border-radius: 8px !important;
-    padding: 10px 24px !important; border: 1px solid {T['accent_cyan']}44 !important;
-    letter-spacing: 1px !important; font-family: 'JetBrains Mono', monospace !important;
+    background: linear-gradient(90deg, {accent_cyan}25, {accent_green}25) !important;
+    color: {accent_cyan} !important; 
+    font-weight: 700 !important;
+    font-size: 12px !important; 
+    border-radius: 8px !important;
+    padding: 10px 24px !important; 
+    border: 1px solid {accent_cyan}50 !important;
+    letter-spacing: 1px !important; 
+    font-family: 'JetBrains Mono', monospace !important;
     transition: all 0.2s !important;
 }}
 .stButton > button:hover {{
-    background: linear-gradient(90deg, {T['accent_cyan']}, {T['accent_green']}) !important;
-    color: {'#000' if is_light else '#000'} !important; border-color: transparent !important;
+    background: linear-gradient(90deg, {accent_cyan}, {accent_green}) !important;
+    color: {btn_text} !important; 
+    border-color: transparent !important;
 }}
 
-/* Tabs */
+/* ============================================
+   TABS
+   ============================================ */
 .stTabs [data-baseweb="tab-list"] {{
-    background: {T['bg_card']} !important;
-    border-bottom: 1px solid {T['border']} !important;
-    gap: 4px !important; padding: 0 8px !important;
+    background: {bg_card} !important;
+    border-bottom: 1px solid {border_color} !important;
+    gap: 4px !important; 
+    padding: 0 8px !important;
     border-radius: 8px 8px 0 0 !important;
 }}
 .stTabs [data-baseweb="tab"] {{
-    background: transparent !important; color: {T['text_dim']} !important;
-    border-radius: 6px 6px 0 0 !important; padding: 10px 20px !important;
-    font-size: 11px !important; font-weight: 600 !important;
-    letter-spacing: 1px !important; border: none !important;
+    background: transparent !important; 
+    color: {text_muted} !important;
+    border-radius: 6px 6px 0 0 !important; 
+    padding: 10px 20px !important;
+    font-size: 11px !important; 
+    font-weight: 600 !important;
+    letter-spacing: 1px !important; 
+    border: none !important;
 }}
 .stTabs [aria-selected="true"] {{
-    background: linear-gradient(135deg, {T['accent_cyan']}15, {T['accent_green']}15) !important;
-    color: {T['accent_cyan']} !important; border-bottom: 2px solid {T['accent_cyan']} !important;
+    background: linear-gradient(135deg, {accent_cyan}20, {accent_green}20) !important;
+    color: {accent_cyan} !important; 
+    border-bottom: 2px solid {accent_cyan} !important;
 }}
 
-/* Inputs */
-.stTextInput > div > div > input, .stNumberInput > div > div > input,
-.stSelectbox > div > div, .stSlider > div {{
-    background-color: {T['bg_card']} !important; border: 1px solid {T['border']} !important;
-    border-radius: 8px !important; color: {T['text_main']} !important;
-    font-family: 'JetBrains Mono', monospace !important; font-size: 12px !important;
+/* ============================================
+   INPUTS
+   ============================================ */
+.stTextInput > div > div > input, 
+.stNumberInput > div > div > input,
+.stSelectbox > div > div, 
+.stSlider > div {{
+    background-color: {bg_card} !important; 
+    border: 1px solid {border_color} !important;
+    border-radius: 8px !important; 
+    color: {text_primary} !important;
+    font-family: 'JetBrains Mono', monospace !important; 
+    font-size: 12px !important;
 }}
 
-/* DataFrames */
-.stDataFrame {{ border: 1px solid {T['border']} !important; border-radius: 10px !important; overflow: hidden !important; }}
-.stProgress > div > div > div {{ background: linear-gradient(90deg, {T['accent_cyan']}, {T['accent_green']}) !important; border-radius: 4px !important; }}
-
-/* Section Headers */
+/* ============================================
+   SECTION HEADERS
+   ============================================ */
 .section-h {{
-    font-family: 'Syne', sans-serif !important; font-size: 1rem;
-    font-weight: 700; color: {T['accent_cyan']}; letter-spacing: 2px;
-    text-transform: uppercase; border-left: 3px solid {T['accent_cyan']};
-    padding-left: 10px; margin: 16px 0 12px;
+    font-family: 'Syne', sans-serif !important; 
+    font-size: 1rem;
+    font-weight: 700; 
+    color: {accent_cyan}; 
+    letter-spacing: 2px;
+    text-transform: uppercase; 
+    border-left: 3px solid {accent_cyan};
+    padding-left: 10px; 
+    margin: 16px 0 12px;
 }}
 
-/* Filter Box */
+/* ============================================
+   FILTER BOXES - CRITICAL FIX
+   ============================================ */
 .filter-box-super {{
-    background: {T['bg_card']}; border: 1px solid {T['border']};
-    border-radius: 8px; padding: 12px; margin: 4px 0;
-    font-size: 12px; color: {T['text_main']} !important;
+    background: {bg_card} !important; 
+    border: 1px solid {border_color} !important;
+    border-radius: 8px !important; 
+    padding: 12px !important; 
+    margin: 4px 0 !important;
+    font-size: 12px !important;
+    color: {text_primary} !important;
+    line-height: 1.5 !important;
 }}
-.filter-box-super b, .filter-box-super strong {{
-    color: {T['accent_cyan']} !important;
+.filter-box-super b,
+.filter-box-super strong {{
+    color: {accent_cyan} !important;
+    font-weight: 700 !important;
+}}
+.filter-box-super small {{
+    color: {text_muted} !important;
+    font-size: 10px !important;
 }}
 .filter-pass {{ 
-    border-left: 3px solid {T['accent_green']}; 
-    background: linear-gradient(90deg, {T['accent_green']}08, {T['bg_card']}) !important;
+    border-left: 3px solid {accent_green} !important; 
+    background: linear-gradient(90deg, {accent_green}15, {bg_card}) !important;
 }}
 .filter-fail {{ 
-    border-left: 3px solid {T['accent_red']}; 
-    background: linear-gradient(90deg, {T['accent_red']}08, {T['bg_card']}) !important;
+    border-left: 3px solid {accent_red} !important; 
+    background: linear-gradient(90deg, {accent_red}15, {bg_card}) !important;
 }}
 
-/* OI Card */
+/* ============================================
+   OI CARDS - CRITICAL FIX
+   ============================================ */
 .oi-card-super {{
-    background: linear-gradient(135deg, {T['bg_card_alt']}, {T['bg_card']});
-    border: 1px solid {T['border']}; border-radius: 10px;
-    padding: 12px; margin: 8px 0;
-    color: {T['text_main']} !important;
+    background: linear-gradient(135deg, {bg_card_alt}, {bg_card}) !important;
+    border: 1px solid {border_color} !important; 
+    border-radius: 10px !important;
+    padding: 12px !important; 
+    margin: 8px 0 !important;
+    color: {text_primary} !important;
 }}
-.oi-metric-val {{ font-size: 20px; font-weight: 700; color: {T['accent_cyan']}; }}
-.oi-metric-lbl {{ font-size: 10px; color: {T['text_dim']}; text-transform: uppercase; letter-spacing: 1px; }}
+.oi-metric-val {{ 
+    font-size: 20px !important; 
+    font-weight: 700 !important; 
+    color: {accent_cyan} !important;
+}}
+.oi-metric-lbl {{ 
+    font-size: 10px !important; 
+    color: {text_muted} !important; 
+    text-transform: uppercase; 
+    letter-spacing: 1px;
+}}
 
-/* Login Box */
+/* ============================================
+   LOGIN BOX
+   ============================================ */
 .login-box {{
-    max-width: 420px; margin: 100px auto;
-    background: linear-gradient(135deg, {T['bg_card']}, {T['bg_card_alt']}) !important;
-    border: 1px solid {T['border']} !important; border-radius: 20px;
-    padding: 50px; text-align: center;
+    max-width: 420px; 
+    margin: 100px auto;
+    background: linear-gradient(135deg, {bg_card}, {bg_card_alt}) !important;
+    border: 1px solid {border_color} !important; 
+    border-radius: 20px;
+    padding: 50px; 
+    text-align: center;
     box-shadow: 0 20px 60px rgba(0,0,0,{'0.5' if is_dark else '0.15'});
 }}
 
-/* Status badges */
+/* ============================================
+   STATUS BADGES
+   ============================================ */
 .status-open {{
-    background: {T['accent_green']}15 !important;
-    border: 1px solid {T['accent_green']}40 !important;
-    color: {T['accent_green']} !important;
-    border-radius: 6px; padding: 6px 14px;
-    font-size: 11px; font-weight: 700; letter-spacing: 1px;
+    background: {accent_green}20 !important;
+    border: 1px solid {accent_green}50 !important;
+    color: {accent_green} !important;
+    border-radius: 6px; 
+    padding: 6px 14px;
+    font-size: 11px; 
+    font-weight: 700; 
+    letter-spacing: 1px;
+    display: inline-block;
 }}
 .status-closed {{
-    background: {T['accent_red']}15 !important;
-    border: 1px solid {T['accent_red']}40 !important;
-    color: {T['accent_red']} !important;
-    border-radius: 6px; padding: 6px 14px;
-    font-size: 11px; font-weight: 700; letter-spacing: 1px;
+    background: {accent_red}20 !important;
+    border: 1px solid {accent_red}50 !important;
+    color: {accent_red} !important;
+    border-radius: 6px; 
+    padding: 6px 14px;
+    font-size: 11px; 
+    font-weight: 700; 
+    letter-spacing: 1px;
+    display: inline-block;
 }}
 
-/* Sector cards */
+/* ============================================
+   SECTOR CARDS
+   ============================================ */
 .sector-card {{
-    background: linear-gradient(135deg, {T['bg_card']}, {T['bg_card_alt']}) !important;
-    border: 1px solid {T['border']} !important; border-radius: 10px;
-    padding: 12px; text-align: center;
+    background: linear-gradient(135deg, {bg_card}, {bg_card_alt}) !important;
+    border: 1px solid {border_color} !important; 
+    border-radius: 10px;
+    padding: 12px; 
+    text-align: center;
 }}
-.sector-up {{ color: {T['accent_green']}; font-size: 18px; font-weight: 700; }}
-.sector-down {{ color: {T['accent_red']}; font-size: 18px; font-weight: 700; }}
-.sector-neutral {{ color: {T['accent_yellow']}; font-size: 18px; font-weight: 700; }}
-.sector-name {{ font-size: 11px; color: {T['text_dim']}; letter-spacing: 1px; }}
-.sector-trend {{ font-size: 9px; color: {T['text_dark']}; }}
+.sector-name {{ 
+    font-size: 11px; 
+    color: {text_muted}; 
+    letter-spacing: 1px; 
+    margin-bottom: 4px;
+}}
+.sector-up {{ 
+    color: {accent_green}; 
+    font-size: 18px; 
+    font-weight: 700; 
+    margin: 4px 0;
+}}
+.sector-down {{ 
+    color: {accent_red}; 
+    font-size: 18px; 
+    font-weight: 700; 
+    margin: 4px 0;
+}}
+.sector-neutral {{ 
+    color: {accent_yellow}; 
+    font-size: 18px; 
+    font-weight: 700; 
+    margin: 4px 0;
+}}
+.sector-trend {{ 
+    font-size: 9px; 
+    color: {text_dark}; 
+    margin-top: 4px;
+}}
 
-/* Skip box */
+/* ============================================
+   SKIP BOX
+   ============================================ */
 .skip-box {{
-    background: {T['accent_yellow']}10 !important;
-    border: 1px solid {T['accent_yellow']}30 !important;
-    border-radius: 8px; padding: 10px 16px;
-    color: {T['accent_yellow']}; font-size: 11px;
+    background: {accent_yellow}15 !important;
+    border: 1px solid {accent_yellow}40 !important;
+    border-radius: 8px; 
+    padding: 10px 16px;
+    color: {accent_yellow} !important; 
+    font-size: 11px;
+    font-weight: 600;
 }}
 
-/* Chart setup */
-.candle-up {{ color: {T['candle_up']}; }}
-.candle-down {{ color: {T['candle_down']}; }}
-
-/* Expander fixes */
+/* ============================================
+   STREAMLIT SPECIFIC FIXES
+   ============================================ */
+/* Expander */
 .streamlit-expanderHeader {{
-    color: {T['text_main']} !important;
+    color: {text_primary} !important;
     font-size: 14px !important;
+    font-weight: 600 !important;
 }}
 .streamlit-expanderContent {{
-    background: {T['bg_main']} !important;
+    background: {bg_primary} !important;
+    color: {text_primary} !important;
+}}
+
+/* Dataframe */
+[data-testid="stDataFrame"] {{
+    border: 1px solid {border_color} !important;
+    border-radius: 10px !important;
+}}
+[data-testid="stDataFrame"] td {{
+    color: {text_primary} !important;
+    background: {bg_card} !important;
+    border-bottom: 1px solid {border_color} !important;
+}}
+[data-testid="stDataFrame"] th {{
+    color: {text_muted} !important;
+    background: {bg_card_alt} !important;
+    border-bottom: 2px solid {border_color} !important;
+    font-size: 10px !important;
+    letter-spacing: 2px !important;
+    text-transform: uppercase !important;
+}}
+
+/* Metrics */
+[data-testid="stMetricValue"] {{
+    color: {text_primary} !important;
+    font-weight: 700 !important;
+}}
+[data-testid="stMetricLabel"] {{
+    color: {text_muted} !important;
+    font-size: 11px !important;
+}}
+[data-testid="stMetricDelta"] {{
+    color: {accent_green} !important;
+}}
+
+/* Radio buttons */
+.stRadio > div {{
+    color: {text_primary} !important;
+}}
+.stRadio label {{
+    color: {text_primary} !important;
+}}
+
+/* Checkbox */
+.stCheckbox > label {{
+    color: {text_primary} !important;
+    font-size: 12px !important;
+}}
+
+/* Slider */
+.stSlider > div > div {{
+    color: {text_primary} !important;
+}}
+
+/* Select slider */
+.stSelectSlider > div {{
+    color: {text_primary} !important;
+}}
+
+/* Number input labels */
+.stNumberInput > label {{
+    color: {text_muted} !important;
+    font-size: 11px !important;
+}}
+
+/* Text input labels */
+.stTextInput > label {{
+    color: {text_muted} !important;
+    font-size: 11px !important;
+}}
+
+/* Selectbox labels */
+.stSelectbox > label {{
+    color: {text_muted} !important;
+    font-size: 11px !important;
+}}
+
+/* ============================================
+   SCROLLBAR
+   ============================================ */
+::-webkit-scrollbar {{
+    width: 8px;
+    height: 8px;
+}}
+::-webkit-scrollbar-track {{
+    background: {bg_card};
+    border-radius: 4px;
+}}
+::-webkit-scrollbar-thumb {{
+    background: {border_color};
+    border-radius: 4px;
+}}
+::-webkit-scrollbar-thumb:hover {{
+    background: {accent_cyan};
 }}
 </style>
 """, unsafe_allow_html=True)
+
 
 
 # ============================================================
@@ -1321,7 +1613,7 @@ def display_signal_card(result):
     else:
         acc_class = "acc-70"
 
-    with st.expander(f"{signal_icon} {result['STOCK']} | ₹{result['LTP']} | {result['ACCURACY']} {oi_badge}"):
+    with st.expander(f"{signal_icon} {result['STOCK']} | ₹{result['LTP']} | {result['ACCURACY']} | {result['OI BUILDUP']}"):
         st.markdown(f'<div class="{card_class}">', unsafe_allow_html=True)
 
         # Top row: Signal + Accuracy
@@ -1389,22 +1681,22 @@ def display_signal_card(result):
         st.markdown("<div class='section-h'>📈 Technicals</div>", unsafe_allow_html=True)
         tech_col1, tech_col2, tech_col3, tech_col4 = st.columns(4)
         with tech_col1:
-            st.markdown(f'<div class="filter-box-super" style="color: {T["text_main"]};"><b style="color: {T["accent_cyan"]};">VWAP:</b> {result["VWAP"]}<br><small style="color: {T["text_dim"]};">Value: ₹{result.get("vwap_val", "N/A")}</small></div>', unsafe_allow_html=True)
+            st.markdown(f'<div style="color: #e8f0f8; background: #0d1a26; border: 1px solid #1e2d3d; border-radius: 8px; padding: 12px; margin: 4px 0; font-size: 12px; line-height: 1.5;"><b style="color: #00d4ff;">VWAP:</b> {result["VWAP"]}<br><small style="color: #a0b8d0;">Value: ₹{result.get("vwap_val", "N/A")}</small></div>', unsafe_allow_html=True)
         with tech_col2:
-            st.markdown(f'<div class="filter-box-super" style="color: {T["text_main"]};"><b style="color: {T["accent_cyan"]};">EMA:</b> {result["EMA TREND"]}<br><small style="color: {T["text_dim"]};">Value: ₹{result.get("ema20_val", "N/A")}</small></div>', unsafe_allow_html=True)
+            st.markdown(f'<div style="color: #e8f0f8; background: #0d1a26; border: 1px solid #1e2d3d; border-radius: 8px; padding: 12px; margin: 4px 0; font-size: 12px; line-height: 1.5;"><b style="color: #00d4ff;">EMA:</b> {result["EMA TREND"]}<br><small style="color: #a0b8d0;">Value: ₹{result.get("ema20_val", "N/A")}</small></div>', unsafe_allow_html=True)
         with tech_col3:
-            st.markdown(f'<div class="filter-box-super" style="color: {T["text_main"]};"><b style="color: {T["accent_cyan"]};">Volume:</b> {result["VOL RATIO"]}<br><small style="color: {T["text_dim"]};">vs Previous Day</small></div>', unsafe_allow_html=True)
+            st.markdown(f'<div style="color: #e8f0f8; background: #0d1a26; border: 1px solid #1e2d3d; border-radius: 8px; padding: 12px; margin: 4px 0; font-size: 12px; line-height: 1.5;"><b style="color: #00d4ff;">Volume:</b> {result["VOL RATIO"]}<br><small style="color: #a0b8d0;">vs Previous Day</small></div>', unsafe_allow_html=True)
         with tech_col4:
-            st.markdown(f'<div class="filter-box-super" style="color: {T["text_main"]};"><b style="color: {T["accent_cyan"]};">ATR:</b> ₹{result.get("atr", "N/A")}<br><small style="color: {T["text_dim"]};">Gap: {result.get("gap_pct", 0)}%</small></div>', unsafe_allow_html=True)
+            st.markdown(f'<div style="color: #e8f0f8; background: #0d1a26; border: 1px solid #1e2d3d; border-radius: 8px; padding: 12px; margin: 4px 0; font-size: 12px; line-height: 1.5;"><b style="color: #00d4ff;">ATR:</b> ₹{result.get("atr", "N/A")}<br><small style="color: #a0b8d0;">Gap: {result.get("gap_pct", 0)}%</small></div>', unsafe_allow_html=True)
 
         # Filter Details
         st.markdown("<div class='section-h'>📋 Filter Analysis</div>", unsafe_allow_html=True)
         filter_details = result.get('filter_details', [])
         for name, passed, detail in filter_details:
             if passed:
-                st.markdown(f'<div class="filter-box-super filter-pass" style="color: {T["text_main"]};">✅ <b style="color: {T["accent_cyan"]};">{name}</b> — <span style="color: {T["text_dim"]};">{detail}</span></div>', unsafe_allow_html=True)
+                st.markdown(f'<div class="filter-box-super filter-pass" style="color: #e8f0f8; background: linear-gradient(90deg, #00ff8815, #0d1a26); border: 1px solid #1e2d3d; border-left: 3px solid #00ff88; border-radius: 8px; padding: 12px; margin: 4px 0; font-size: 12px; line-height: 1.5;">✅ <b style="color: #00d4ff;">{name}</b> — <span style="color: #a0b8d0;">{detail}</span></div>', unsafe_allow_html=True)
             else:
-                st.markdown(f'<div class="filter-box-super filter-fail" style="color: {T["text_main"]};">❌ <b style="color: {T["accent_red"]};">{name}</b> — <span style="color: {T["text_dim"]};">{detail}</span></div>', unsafe_allow_html=True)
+                st.markdown(f'<div class="filter-box-super filter-fail" style="color: #e8f0f8; background: linear-gradient(90deg, #ff406015, #0d1a26); border: 1px solid #1e2d3d; border-left: 3px solid #ff4060; border-radius: 8px; padding: 12px; margin: 4px 0; font-size: 12px; line-height: 1.5;">❌ <b style="color: #ff4060;">{name}</b> — <span style="color: #a0b8d0;">{detail}</span></div>', unsafe_allow_html=True)
 
         # Add to Journal button
         if st.button(f"📝 Add {result['STOCK']} to Journal", key=f"journal_{result['STOCK']}"):
