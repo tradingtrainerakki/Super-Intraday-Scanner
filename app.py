@@ -676,102 +676,50 @@ section[data-testid="stSidebar"] * {{
     background: {accent_cyan};
 }}
 
-/* ============================================
-   HOVER FIXES - Prevent white background
-   ============================================ */
-/* Streamlit expander hover */
-.streamlit-expanderHeader:hover {
-    background: #0d1a26 !important;
-    color: #e8f0f8 !important;
-}
-
-/* Dataframe row hover */
-[data-testid="stDataFrame"] tr:hover {
-    background: #1a2436 !important;
-}
-
-/* Card hover effects */
-.metric-card-super:hover {
-    background: linear-gradient(135deg, #1a2436, #162030) !important;
-    border-color: #00d4ff55 !important;
-}
-
-/* Any element hover - prevent white flash */
-*::selection {
-    background: #00d4ff33 !important;
-    color: #e8f0f8 !important;
-}
-
-/* Streamlit specific hover fixes */
-[data-testid="stVerticalBlock"] > div:hover {
-    background: transparent !important;
-}
-
-/* Prevent white background on all interactive elements */
-button:hover, 
-.stButton > button:hover,
-.stCheckbox > label:hover,
-.stRadio > label:hover,
-.stSelectbox > div:hover,
-.stSlider > div:hover {
-    background: transparent !important;
-}
-
-/* Expander content hover */
-.streamlit-expanderContent:hover {
-    background: #080c12 !important;
-}
-
-/* Table/Dataframe hover rows */
-.stDataFrame tbody tr:hover {
-    background-color: #0d1a26 !important;
-    color: #e8f0f8 !important;
-}
-
-/* Sidebar hover */
-section[data-testid="stSidebar"] .stButton > button:hover {
-    background: linear-gradient(90deg, #00d4ff33, #00ff8833) !important;
-}
-
-/* ============================================
-   EXPANDER HOVER - CRITICAL FIX
-   ============================================ */
-.streamlit-expander {
-    background: #0d1a26 !important;
-    border: 1px solid #1e2d3d !important;
-    border-radius: 12px !important;
-    margin: 8px 0 !important;
-}
-
-.streamlit-expander:hover {
-    background: #1a2436 !important;
-    border-color: #00d4ff55 !important;
-}
-
-.streamlit-expanderHeader {
-    background: #0d1a26 !important;
-    color: #e8f0f8 !important;
-    border-radius: 12px !important;
-    padding: 16px !important;
-    font-weight: 600 !important;
-    transition: all 0.2s ease !important;
-}
-
-.streamlit-expanderHeader:hover {
-    background: #1a2436 !important;
-    color: #00d4ff !important;
-}
-
-.streamlit-expanderContent {
-    background: #080c12 !important;
-    color: #e8f0f8 !important;
-    border-top: 1px solid #1e2d3d !important;
-    padding: 16px !important;
-}
 </style>
 """, unsafe_allow_html=True)
 
 
+
+# ============================================================
+# HOVER FIX CSS (Separate from theme to avoid f-string brace conflicts)
+# ============================================================
+st.markdown("""
+<style>
+/* Expander hover - prevent white flash */
+.streamlit-expanderHeader:hover {
+    background: #1a2436 !important;
+    color: #00d4ff !important;
+}
+.streamlit-expanderContent:hover {
+    background: #080c12 !important;
+}
+
+/* Dataframe hover */
+[data-testid="stDataFrame"] tr:hover {
+    background: #0d1a26 !important;
+}
+
+/* Card hover */
+.metric-card-super:hover {
+    border-color: #00d4ff55 !important;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar {
+    width: 8px; height: 8px;
+}
+::-webkit-scrollbar-track {
+    background: #0d1a26; border-radius: 4px;
+}
+::-webkit-scrollbar-thumb {
+    background: #1e2d3d; border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+    background: #00d4ff;
+}
+</style>
+""", unsafe_allow_html=True)
 
 # ============================================================
 # SIDEBAR
