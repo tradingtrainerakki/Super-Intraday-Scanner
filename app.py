@@ -681,8 +681,8 @@ section[data-testid="stSidebar"] * {{
    ============================================ */
 /* Streamlit expander hover */
 .streamlit-expanderHeader:hover {
-    background: var(--bg-card) !important;
-    color: var(--text-primary) !important;
+    background: #0d1a26 !important;
+    color: #e8f0f8 !important;
 }
 
 /* Dataframe row hover */
