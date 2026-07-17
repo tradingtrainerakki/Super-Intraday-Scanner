@@ -737,6 +737,21 @@ with st.sidebar:
         label_visibility="collapsed"
     )
 
+    # Show universe selector immediately when FULL SCAN is selected
+    if "FULL" in scan_mode:
+        st.markdown("<div class='section-h'>📋 Select Universe</div>", unsafe_allow_html=True)
+        universe = st.selectbox("", 
+            ["Nifty 50", "Nifty Next 50", "Bank Nifty", "F&O Pro Top 20", "Custom"],
+            label_visibility="collapsed",
+            key="universe_select")
+
+        if universe == "Custom":
+            custom_input = st.text_area("Enter symbols (comma separated)", 
+                                        "RELIANCE, TCS, HDFCBANK", key="custom_stocks")
+            st.session_state.custom_stock_list = [s.strip().upper() for s in custom_input.split(",") if s.strip()]
+        else:
+            st.session_state.selected_universe = universe
+
     st.markdown("---")
     st.markdown("<div class='section-h'>ORB Settings</div>", unsafe_allow_html=True)
     orb_minutes = st.slider("Opening Range (min)", 5, 30, 15, 
@@ -1799,19 +1814,17 @@ with tab1:
                     stock_list = [item['symbol'] for item in oi_list[:20]]
                     st.info(f"🏃 Quick Scan: Top {len(stock_list)} OI Spurt stocks")
                 else:
-                    # Full scan - need to select universe
-                    universe = st.selectbox("Select Universe", 
-                        ["Nifty 50", "Nifty Next 50", "Bank Nifty", "F&O Pro Top 20", "Custom"],
-                        key="universe_select")
+                    # Full scan - use pre-selected universe from sidebar
+                    universe = st.session_state.get('selected_universe', 'Nifty 50')
 
                     if universe == "F&O Pro Top 20":
                         stock_list = [item['symbol'] for item in oi_list[:20]]
                     elif universe == "Custom":
-                        custom_input = st.text_area("Enter symbols (comma separated)", 
-                                                    "RELIANCE, TCS, HDFCBANK", key="custom_stocks")
-                        stock_list = [s.strip().upper() for s in custom_input.split(",") if s.strip()]
+                        stock_list = st.session_state.get('custom_stock_list', ["RELIANCE", "TCS", "HDFCBANK"])
                     else:
                         stock_list = STOCK_UNIVERSES.get(universe, [])
+
+                    st.info(f"🔍 Full Scan: {universe} — {len(stock_list)} stocks")
 
                 # Scan stocks
                 results = []
