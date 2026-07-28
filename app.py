@@ -1,3 +1,7 @@
+# SUPER SCANNER PRO - v2.0 FRESH
+# Cache-bust: 2026-07-28-2340
+# Fixed: Theme KeyError, Sidebar CSS cleaned
+
 import streamlit as st
 import pandas as pd
 import yfinance as yf
