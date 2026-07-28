@@ -1311,6 +1311,79 @@ section[data-testid="stSidebar"] *:focus {
     color: #00d4ff !important;
     fill: #00d4ff !important;
 }
+
+/* ============================================
+   SIDEBAR TOGGLE BUTTON FIX
+   Make the default Streamlit sidebar toggle visible
+   ============================================ */
+
+/* Sidebar collapsed state - show the toggle button */
+[data-testid="stSidebarCollapsedControl"] {
+    background: linear-gradient(135deg, #0d1a26, #111820) !important;
+    border: 1px solid #1e2d3d !important;
+    border-radius: 0 8px 8px 0 !important;
+    color: #00d4ff !important;
+    padding: 8px !important;
+    top: 10px !important;
+    left: 0 !important;
+    z-index: 999 !important;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.4) !important;
+    transition: all 0.3s ease !important;
+}
+
+[data-testid="stSidebarCollapsedControl"]:hover {
+    background: linear-gradient(135deg, #1a2436, #162030) !important;
+    border-color: #00d4ff55 !important;
+    transform: scale(1.1) !important;
+}
+
+[data-testid="stSidebarCollapsedControl"] svg {
+    color: #00d4ff !important;
+    fill: #00d4ff !important;
+    width: 24px !important;
+    height: 24px !important;
+}
+
+/* Sidebar expand button (when sidebar is collapsed) */
+[data-testid="stSidebarCollapsedControl"] > div {
+    background: transparent !important;
+}
+
+/* Ensure the button is always clickable */
+[data-testid="stSidebarCollapsedControl"]::before {
+    content: "☰" !important;
+    color: #00d4ff !important;
+    font-size: 18px !important;
+    font-weight: 700 !important;
+}
+
+/* Hide the default Streamlit icon and show custom */
+[data-testid="stSidebarCollapsedControl"] svg {
+    display: none !important;
+}
+
+/* Sidebar open state - toggle button styling */
+[data-testid="stBaseButton-headerNoPadding"] {
+    background: linear-gradient(135deg, #0d1a26, #111820) !important;
+    border: 1px solid #1e2d3d !important;
+    color: #00d4ff !important;
+    border-radius: 8px !important;
+    padding: 6px 10px !important;
+    transition: all 0.2s ease !important;
+}
+
+[data-testid="stBaseButton-headerNoPadding"]:hover {
+    background: linear-gradient(135deg, #1a2436, #162030) !important;
+    border-color: #00d4ff55 !important;
+}
+
+/* Ensure sidebar toggle is visible on mobile too */
+@media (max-width: 768px) {
+    [data-testid="stSidebarCollapsedControl"] {
+        top: 60px !important;
+        padding: 12px !important;
+    }
+}
 </style>
 """, unsafe_allow_html=True)
 
@@ -1336,11 +1409,6 @@ with st.sidebar:
         </div>
     </div>
     """, unsafe_allow_html=True)
-
-    if st.button("🚪 Logout", use_container_width=True):
-        st.session_state.authenticated = False
-        st.session_state.username = ""
-        st.rerun()
 
     st.markdown("---")
 
@@ -1480,14 +1548,32 @@ open_status, market_msg = is_market_open()
 now_str = now_ist().strftime("%d %b %Y · %H:%M:%S IST")
 
 # Sidebar toggle button
-if "sidebar_visible" not in st.session_state:
-    st.session_state.sidebar_visible = True
+if "sidebar_collapsed" not in st.session_state:
+    st.session_state.sidebar_collapsed = False
 
-col_header1, col_header2 = st.columns([6, 1])
-with col_header2:
-    if st.button("☰" if st.session_state.sidebar_visible else "☰", key="sidebar_toggle"):
-        st.session_state.sidebar_visible = not st.session_state.sidebar_visible
-        st.rerun()
+toggle_col1, toggle_col2 = st.columns([8, 1])
+with toggle_col2:
+    if st.button("☰", key="sidebar_toggle_btn", help="Toggle Sidebar"):
+        st.session_state.sidebar_collapsed = not st.session_state.sidebar_collapsed
+        # Use JavaScript to toggle sidebar via CSS
+        st.markdown("""
+        <script>
+            // Toggle sidebar visibility
+            var sidebar = parent.document.querySelector('[data-testid="stSidebar"]');
+            var main = parent.document.querySelector('.main');
+            if (sidebar) {
+                if (sidebar.style.width === '0px') {
+                    sidebar.style.width = '';
+                    sidebar.style.minWidth = '';
+                    sidebar.style.display = '';
+                } else {
+                    sidebar.style.width = '0px';
+                    sidebar.style.minWidth = '0px';
+                    sidebar.style.display = 'none';
+                }
+            }
+        </script>
+        """, unsafe_allow_html=True)
 
 st.markdown(f"""
 <div class="super-header">
@@ -1505,6 +1591,14 @@ st.markdown(f"""
   </div>
 </div>
 """, unsafe_allow_html=True)
+
+# Logout button in header (top right)
+header_cols = st.columns([10, 1])
+with header_cols[1]:
+    if st.button("🚪", key="header_logout", help="Logout"):
+        st.session_state.authenticated = False
+        st.session_state.username = ""
+        st.rerun()
 
 # ============================================================
 # STOCK UNIVERSES
