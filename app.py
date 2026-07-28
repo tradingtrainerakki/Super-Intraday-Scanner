@@ -130,6 +130,10 @@ THEMES = {
 
 
 # Apply dynamic theme CSS
+# Validate theme - fix for KeyError on Streamlit Cloud
+if 'theme' not in st.session_state or st.session_state.theme not in THEMES:
+    st.session_state.theme = "DARK"
+
 T = THEMES[st.session_state.theme]
 is_dark = st.session_state.theme in ["DARK", "MODERATE"]
 is_light = st.session_state.theme == "LIGHT"
