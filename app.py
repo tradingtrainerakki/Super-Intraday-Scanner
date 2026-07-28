@@ -2697,6 +2697,16 @@ with tab1:
 
                 df_results = pd.DataFrame(results)
 
+# Reorder columns: News pehle, phir LTP, phir OI data
+if not df_results.empty:
+    desired_order = [
+        'STOCK', 'SIGNAL', 'NEWS_ALERT', 'NEWS_DESC', 'LTP', 'CHG %',
+        'OI SPURT %', 'VOL RATIO', 'OI BUILDUP', 'OI SIGNAL',
+        'FILTERS', 'OI ALIGN', 'ACCURACY'
+    ]
+    remaining = [c for c in df_results.columns if c not in desired_order]
+    df_results = df_results[desired_order + remaining]
+
                 if signal_filter != "All Signals":
                     filter_map = {
                         "🚀 Strong Buy": "STRONG BUY",
