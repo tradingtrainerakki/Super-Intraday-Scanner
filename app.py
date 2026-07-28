@@ -34,32 +34,6 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-
-# ============================================================
-# HIDE ONLY SIDEBAR COLLAPSE BUTTON (Streamlit 1.44+)
-# ============================================================
-st.markdown("""
-<style>
-/* ONLY hide the sidebar collapse/expand toggle button */
-[data-testid="stBaseButton-header"] {
-    display: none !important;
-}
-
-/* Keep sidebar always expanded */
-section[data-testid="stSidebar"] {
-    transform: none !important;
-    transition: none !important;
-}
-</style>
-""", unsafe_allow_html=True)
-
-
-
-
-
-
-
-
 # ============================================================
 # AUTHENTICATION
 # ============================================================
@@ -161,11 +135,6 @@ if 'theme' not in st.session_state or st.session_state.theme not in THEMES:
     st.session_state.theme = "DARK"
 
 T = THEMES[st.session_state.theme]
-
-
-
-
-
 is_dark = st.session_state.theme in ["DARK", "MODERATE"]
 is_light = st.session_state.theme == "LIGHT"
 
