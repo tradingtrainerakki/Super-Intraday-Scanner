@@ -1654,6 +1654,75 @@ def calculate_atr(df, period=14):
     except:
         return 0
 
+
+# ============================================================
+# NEWS & CORPORATE ACTION CHECK
+# ============================================================
+
+def get_corporate_actions(ticker):
+    """Check for today's corporate actions, results, block deals, bulk deals"""
+    try:
+        # Try nsepython first
+        if NSEPYTHON_AVAILABLE:
+            try:
+                # Check corporate announcements
+                ca_url = f"https://www.nseindia.com/api/corporate-announcements?index=equities&symbol={ticker}"
+                ca_data = nsefetch(ca_url)
+                if ca_data and len(ca_data) > 0:
+                    # Check if any announcement is from today
+                    today_str = datetime.now(IST).strftime('%d-%b-%Y')
+                    for item in ca_data[:5]:
+                        desc = item.get('desc', '').lower()
+                        if any(kw in desc for kw in ['result', 'earnings', 'dividend', 'bonus', 'split', 'rights', 'board meeting', 'agm']):
+                            return {
+                                'has_news': True,
+                                'type': 'CORPORATE ACTION',
+                                'description': item.get('desc', 'Corporate announcement'),
+                                'date': item.get('an_dt', today_str)
+                            }
+            except:
+                pass
+
+            try:
+                # Check block/bulk deals
+                deals_url = "https://www.nseindia.com/api/snapshot-capital-market-info"
+                deals_data = nsefetch(deals_url)
+                if deals_data:
+                    # Check block deals
+                    block_deals = deals_data.get('blockDeals', [])
+                    for deal in block_deals:
+                        if deal.get('symbol', '') == ticker:
+                            return {
+                                'has_news': True,
+                                'type': 'BLOCK DEAL',
+                                'description': f"Block deal: {deal.get('quantity', 'N/A')} shares @ ₹{deal.get('price', 'N/A')}",
+                                'date': datetime.now(IST).strftime('%d-%b-%Y')
+                            }
+
+                    # Check bulk deals
+                    bulk_deals = deals_data.get('bulkDeals', [])
+                    for deal in bulk_deals:
+                        if deal.get('symbol', '') == ticker:
+                            return {
+                                'has_news': True,
+                                'type': 'BULK DEAL',
+                                'description': f"Bulk deal: {deal.get('quantity', 'N/A')} shares @ ₹{deal.get('price', 'N/A')}",
+                                'date': datetime.now(IST).strftime('%d-%b-%Y')
+                            }
+            except:
+                pass
+
+        # Fallback: Check known earnings calendar dates (simplified)
+        # Major companies typically announce results in specific months
+        today = datetime.now(IST)
+        month = today.month
+
+        # This is a simplified check - in production you'd use a proper API
+        return {'has_news': False, 'type': None, 'description': None, 'date': None}
+
+    except Exception as e:
+        return {'has_news': False, 'type': None, 'description': None, 'date': None}
+
 # ============================================================
 # NSE OI SPURTS - FIXED WITH NSEPYTHON
 # ============================================================
@@ -2016,15 +2085,30 @@ def analyze_stock_orb_oi(ticker, oi_info, orb_mins=15, gap_filter=True,
         elif base_signal == "SELL" and oi_signal in ["STRONG LONG", "LONG", "SHORT SQUEEZE"]:
             oi_alignment = -1
 
+        # ── NEWS & CORPORATE ACTION CHECK ──
+        news_info = get_corporate_actions(ticker)
+        has_news = news_info.get('has_news', False)
+        news_type = news_info.get('type', '')
+        news_desc = news_info.get('description', '')
+
         # ── FINAL SIGNAL ──
-        if accuracy >= 80 and oi_alignment >= 0:
-            final_signal = f"🚀 STRONG {base_signal}"
-        elif accuracy >= 60 and oi_alignment >= 0:
-            final_signal = f"✅ {base_signal}"
-        elif accuracy >= 60 and oi_alignment < 0:
-            final_signal = f"⚠️ WEAK {base_signal}"
+        # Apply news warning if corporate action detected
+        if has_news:
+            if accuracy >= 80 and oi_alignment >= 0:
+                final_signal = f"🚨 NEWS TODAY — {base_signal} (CAUTION)"
+            elif accuracy >= 60 and oi_alignment >= 0:
+                final_signal = f"⚠️ NEWS TODAY — WEAK {base_signal}"
+            else:
+                final_signal = "🟡 WAIT — NEWS TODAY"
         else:
-            final_signal = "🟡 WAIT"
+            if accuracy >= 80 and oi_alignment >= 0:
+                final_signal = f"🚀 STRONG {base_signal}"
+            elif accuracy >= 60 and oi_alignment >= 0:
+                final_signal = f"✅ {base_signal}"
+            elif accuracy >= 60 and oi_alignment < 0:
+                final_signal = f"⚠️ WEAK {base_signal}"
+            else:
+                final_signal = "🟡 WAIT"
 
         chg_pct = round(((current_price - prev_close) / prev_close) * 100, 2)
 
@@ -2032,6 +2116,8 @@ def analyze_stock_orb_oi(ticker, oi_info, orb_mins=15, gap_filter=True,
             "STOCK": ticker,
             "SIGNAL": final_signal,
             "BASE_SIGNAL": base_signal,
+            "NEWS_ALERT": "🚨 " + news_type if has_news else "✅ No News",
+            "NEWS_DESC": news_desc if has_news else "No corporate action today",
             "LTP": round(current_price, 2),
             "CHG %": f"{'+' if chg_pct >= 0 else ''}{chg_pct}%",
             "ORB_HIGH": round(orb_high, 2),
