@@ -718,6 +718,15 @@ st.markdown("""
 ::-webkit-scrollbar-thumb:hover {
     background: #00d4ff;
 }
+
+/* Sidebar visibility toggle */
+.sidebar-hidden section[data-testid="stSidebar"] {
+    display: none !important;
+}
+.sidebar-hidden .main {
+    margin-left: 0 !important;
+    max-width: 100% !important;
+}
 </style>
 """, unsafe_allow_html=True)
 
@@ -1469,6 +1478,16 @@ def is_market_open():
 
 open_status, market_msg = is_market_open()
 now_str = now_ist().strftime("%d %b %Y · %H:%M:%S IST")
+
+# Sidebar toggle button
+if "sidebar_visible" not in st.session_state:
+    st.session_state.sidebar_visible = True
+
+col_header1, col_header2 = st.columns([6, 1])
+with col_header2:
+    if st.button("☰" if st.session_state.sidebar_visible else "☰", key="sidebar_toggle"):
+        st.session_state.sidebar_visible = not st.session_state.sidebar_visible
+        st.rerun()
 
 st.markdown(f"""
 <div class="super-header">
