@@ -1977,6 +1977,18 @@ def analyze_stock_orb_oi(ticker, oi_info, orb_mins=15, gap_filter=True,
 
         # ── OI BUILDUP CLASSIFICATION ──
         oi_pct = oi_info.get('oi_chg_pct', 0)
+
+        # ── STRICT FILTER: Skip if Volume or OI below threshold ──
+        if volume_filter and vol_ratio is not None:
+            min_vol = st.session_state.get("min_vol_ratio", 2.0)
+            if vol_ratio < min_vol:
+                return None, f"Volume filter: {vol_ratio}x < {min_vol}x"
+
+        if use_oi:
+            min_oi = st.session_state.get("min_oi_change", 10)
+            if abs(oi_pct) < min_oi:
+                return None, f"OI filter: {abs(oi_pct)}% < {min_oi}%"
+
         oi_up = oi_pct > 0
         price_up = ((current_price - prev_close) / prev_close * 100) > 0
 
