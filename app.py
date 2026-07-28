@@ -1,7 +1,3 @@
-# SUPER SCANNER PRO - v2.0 FRESH
-# Cache-bust: 2026-07-28-2340
-# Fixed: Theme KeyError, Sidebar CSS cleaned
-
 import streamlit as st
 import pandas as pd
 import yfinance as yf
@@ -134,10 +130,6 @@ THEMES = {
 
 
 # Apply dynamic theme CSS
-# Validate theme - fix for KeyError on Streamlit Cloud
-if 'theme' not in st.session_state or st.session_state.theme not in THEMES:
-    st.session_state.theme = "DARK"
-
 T = THEMES[st.session_state.theme]
 is_dark = st.session_state.theme in ["DARK", "MODERATE"]
 is_light = st.session_state.theme == "LIGHT"
