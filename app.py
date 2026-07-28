@@ -718,15 +718,6 @@ st.markdown("""
 ::-webkit-scrollbar-thumb:hover {
     background: #00d4ff;
 }
-
-/* Sidebar visibility toggle */
-.sidebar-hidden section[data-testid="stSidebar"] {
-    display: none !important;
-}
-.sidebar-hidden .main {
-    margin-left: 0 !important;
-    max-width: 100% !important;
-}
 </style>
 """, unsafe_allow_html=True)
 
@@ -1311,79 +1302,6 @@ section[data-testid="stSidebar"] *:focus {
     color: #00d4ff !important;
     fill: #00d4ff !important;
 }
-
-/* ============================================
-   SIDEBAR TOGGLE BUTTON FIX
-   Make the default Streamlit sidebar toggle visible
-   ============================================ */
-
-/* Sidebar collapsed state - show the toggle button */
-[data-testid="stSidebarCollapsedControl"] {
-    background: linear-gradient(135deg, #0d1a26, #111820) !important;
-    border: 1px solid #1e2d3d !important;
-    border-radius: 0 8px 8px 0 !important;
-    color: #00d4ff !important;
-    padding: 8px !important;
-    top: 10px !important;
-    left: 0 !important;
-    z-index: 999 !important;
-    box-shadow: 0 4px 20px rgba(0,0,0,0.4) !important;
-    transition: all 0.3s ease !important;
-}
-
-[data-testid="stSidebarCollapsedControl"]:hover {
-    background: linear-gradient(135deg, #1a2436, #162030) !important;
-    border-color: #00d4ff55 !important;
-    transform: scale(1.1) !important;
-}
-
-[data-testid="stSidebarCollapsedControl"] svg {
-    color: #00d4ff !important;
-    fill: #00d4ff !important;
-    width: 24px !important;
-    height: 24px !important;
-}
-
-/* Sidebar expand button (when sidebar is collapsed) */
-[data-testid="stSidebarCollapsedControl"] > div {
-    background: transparent !important;
-}
-
-/* Ensure the button is always clickable */
-[data-testid="stSidebarCollapsedControl"]::before {
-    content: "☰" !important;
-    color: #00d4ff !important;
-    font-size: 18px !important;
-    font-weight: 700 !important;
-}
-
-/* Hide the default Streamlit icon and show custom */
-[data-testid="stSidebarCollapsedControl"] svg {
-    display: none !important;
-}
-
-/* Sidebar open state - toggle button styling */
-[data-testid="stBaseButton-headerNoPadding"] {
-    background: linear-gradient(135deg, #0d1a26, #111820) !important;
-    border: 1px solid #1e2d3d !important;
-    color: #00d4ff !important;
-    border-radius: 8px !important;
-    padding: 6px 10px !important;
-    transition: all 0.2s ease !important;
-}
-
-[data-testid="stBaseButton-headerNoPadding"]:hover {
-    background: linear-gradient(135deg, #1a2436, #162030) !important;
-    border-color: #00d4ff55 !important;
-}
-
-/* Ensure sidebar toggle is visible on mobile too */
-@media (max-width: 768px) {
-    [data-testid="stSidebarCollapsedControl"] {
-        top: 60px !important;
-        padding: 12px !important;
-    }
-}
 </style>
 """, unsafe_allow_html=True)
 
@@ -1409,6 +1327,11 @@ with st.sidebar:
         </div>
     </div>
     """, unsafe_allow_html=True)
+
+    if st.button("🚪 Logout", use_container_width=True):
+        st.session_state.authenticated = False
+        st.session_state.username = ""
+        st.rerun()
 
     st.markdown("---")
 
@@ -1547,34 +1470,6 @@ def is_market_open():
 open_status, market_msg = is_market_open()
 now_str = now_ist().strftime("%d %b %Y · %H:%M:%S IST")
 
-# Sidebar toggle button
-if "sidebar_collapsed" not in st.session_state:
-    st.session_state.sidebar_collapsed = False
-
-toggle_col1, toggle_col2 = st.columns([8, 1])
-with toggle_col2:
-    if st.button("☰", key="sidebar_toggle_btn", help="Toggle Sidebar"):
-        st.session_state.sidebar_collapsed = not st.session_state.sidebar_collapsed
-        # Use JavaScript to toggle sidebar via CSS
-        st.markdown("""
-        <script>
-            // Toggle sidebar visibility
-            var sidebar = parent.document.querySelector('[data-testid="stSidebar"]');
-            var main = parent.document.querySelector('.main');
-            if (sidebar) {
-                if (sidebar.style.width === '0px') {
-                    sidebar.style.width = '';
-                    sidebar.style.minWidth = '';
-                    sidebar.style.display = '';
-                } else {
-                    sidebar.style.width = '0px';
-                    sidebar.style.minWidth = '0px';
-                    sidebar.style.display = 'none';
-                }
-            }
-        </script>
-        """, unsafe_allow_html=True)
-
 st.markdown(f"""
 <div class="super-header">
   <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;">
@@ -1591,14 +1486,6 @@ st.markdown(f"""
   </div>
 </div>
 """, unsafe_allow_html=True)
-
-# Logout button in header (top right)
-header_cols = st.columns([10, 1])
-with header_cols[1]:
-    if st.button("🚪", key="header_logout", help="Logout"):
-        st.session_state.authenticated = False
-        st.session_state.username = ""
-        st.rerun()
 
 # ============================================================
 # STOCK UNIVERSES
@@ -1766,75 +1653,6 @@ def calculate_atr(df, period=14):
         return float(atr.iloc[-1]) if not pd.isna(atr.iloc[-1]) else 0
     except:
         return 0
-
-
-# ============================================================
-# NEWS & CORPORATE ACTION CHECK
-# ============================================================
-
-def get_corporate_actions(ticker):
-    """Check for today's corporate actions, results, block deals, bulk deals"""
-    try:
-        # Try nsepython first
-        if NSEPYTHON_AVAILABLE:
-            try:
-                # Check corporate announcements
-                ca_url = f"https://www.nseindia.com/api/corporate-announcements?index=equities&symbol={ticker}"
-                ca_data = nsefetch(ca_url)
-                if ca_data and len(ca_data) > 0:
-                    # Check if any announcement is from today
-                    today_str = datetime.now(IST).strftime('%d-%b-%Y')
-                    for item in ca_data[:5]:
-                        desc = item.get('desc', '').lower()
-                        if any(kw in desc for kw in ['result', 'earnings', 'dividend', 'bonus', 'split', 'rights', 'board meeting', 'agm']):
-                            return {
-                                'has_news': True,
-                                'type': 'CORPORATE ACTION',
-                                'description': item.get('desc', 'Corporate announcement'),
-                                'date': item.get('an_dt', today_str)
-                            }
-            except:
-                pass
-
-            try:
-                # Check block/bulk deals
-                deals_url = "https://www.nseindia.com/api/snapshot-capital-market-info"
-                deals_data = nsefetch(deals_url)
-                if deals_data:
-                    # Check block deals
-                    block_deals = deals_data.get('blockDeals', [])
-                    for deal in block_deals:
-                        if deal.get('symbol', '') == ticker:
-                            return {
-                                'has_news': True,
-                                'type': 'BLOCK DEAL',
-                                'description': f"Block deal: {deal.get('quantity', 'N/A')} shares @ ₹{deal.get('price', 'N/A')}",
-                                'date': datetime.now(IST).strftime('%d-%b-%Y')
-                            }
-
-                    # Check bulk deals
-                    bulk_deals = deals_data.get('bulkDeals', [])
-                    for deal in bulk_deals:
-                        if deal.get('symbol', '') == ticker:
-                            return {
-                                'has_news': True,
-                                'type': 'BULK DEAL',
-                                'description': f"Bulk deal: {deal.get('quantity', 'N/A')} shares @ ₹{deal.get('price', 'N/A')}",
-                                'date': datetime.now(IST).strftime('%d-%b-%Y')
-                            }
-            except:
-                pass
-
-        # Fallback: Check known earnings calendar dates (simplified)
-        # Major companies typically announce results in specific months
-        today = datetime.now(IST)
-        month = today.month
-
-        # This is a simplified check - in production you'd use a proper API
-        return {'has_news': False, 'type': None, 'description': None, 'date': None}
-
-    except Exception as e:
-        return {'has_news': False, 'type': None, 'description': None, 'date': None}
 
 # ============================================================
 # NSE OI SPURTS - FIXED WITH NSEPYTHON
@@ -2198,30 +2016,15 @@ def analyze_stock_orb_oi(ticker, oi_info, orb_mins=15, gap_filter=True,
         elif base_signal == "SELL" and oi_signal in ["STRONG LONG", "LONG", "SHORT SQUEEZE"]:
             oi_alignment = -1
 
-        # ── NEWS & CORPORATE ACTION CHECK ──
-        news_info = get_corporate_actions(ticker)
-        has_news = news_info.get('has_news', False)
-        news_type = news_info.get('type', '')
-        news_desc = news_info.get('description', '')
-
         # ── FINAL SIGNAL ──
-        # Apply news warning if corporate action detected
-        if has_news:
-            if accuracy >= 80 and oi_alignment >= 0:
-                final_signal = f"🚨 NEWS TODAY — {base_signal} (CAUTION)"
-            elif accuracy >= 60 and oi_alignment >= 0:
-                final_signal = f"⚠️ NEWS TODAY — WEAK {base_signal}"
-            else:
-                final_signal = "🟡 WAIT — NEWS TODAY"
+        if accuracy >= 80 and oi_alignment >= 0:
+            final_signal = f"🚀 STRONG {base_signal}"
+        elif accuracy >= 60 and oi_alignment >= 0:
+            final_signal = f"✅ {base_signal}"
+        elif accuracy >= 60 and oi_alignment < 0:
+            final_signal = f"⚠️ WEAK {base_signal}"
         else:
-            if accuracy >= 80 and oi_alignment >= 0:
-                final_signal = f"🚀 STRONG {base_signal}"
-            elif accuracy >= 60 and oi_alignment >= 0:
-                final_signal = f"✅ {base_signal}"
-            elif accuracy >= 60 and oi_alignment < 0:
-                final_signal = f"⚠️ WEAK {base_signal}"
-            else:
-                final_signal = "🟡 WAIT"
+            final_signal = "🟡 WAIT"
 
         chg_pct = round(((current_price - prev_close) / prev_close) * 100, 2)
 
@@ -2229,8 +2032,6 @@ def analyze_stock_orb_oi(ticker, oi_info, orb_mins=15, gap_filter=True,
             "STOCK": ticker,
             "SIGNAL": final_signal,
             "BASE_SIGNAL": base_signal,
-            "NEWS_ALERT": "🚨 " + news_type if has_news else "✅ No News",
-            "NEWS_DESC": news_desc if has_news else "No corporate action today",
             "LTP": round(current_price, 2),
             "CHG %": f"{'+' if chg_pct >= 0 else ''}{chg_pct}%",
             "ORB_HIGH": round(orb_high, 2),
