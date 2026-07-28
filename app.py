@@ -36,35 +36,20 @@ st.set_page_config(
 
 
 # ============================================================
-# FORCE SIDEBAR ALWAYS VISIBLE (Fix collapsed state persistence)
+# FORCE SIDEBAR ALWAYS VISIBLE
 # ============================================================
 st.markdown("""
 <style>
-/* Override Streamlit's collapsed state */
 section[data-testid="stSidebar"] {
-    transform: none !important;
-    margin-left: 0 !important;
-    visibility: visible !important;
-    display: block !important;
-    width: 320px !important;
-    min-width: 320px !important;
-    max-width: 320px !important;
-}
-/* The main content should respect sidebar width */
-[data-testid="stAppViewContainer"] > section:first-child + section {
-    margin-left: 320px !important;
+    transform: none !important; margin-left: 0 !important;
+    visibility: visible !important; display: block !important;
+    width: 320px !important; min-width: 320px !important;
 }
 </style>
 <script>
-// Force sidebar open on every load
 window.addEventListener('load', function() {
-    var sidebar = document.querySelector('section[data-testid="stSidebar"]');
-    if (sidebar) {
-        sidebar.style.transform = 'none';
-        sidebar.style.marginLeft = '0';
-        sidebar.style.visibility = 'visible';
-        sidebar.style.display = 'block';
-    }
+    var sb = document.querySelector('section[data-testid="stSidebar"]');
+    if (sb) { sb.style.transform='none'; sb.style.marginLeft='0'; sb.style.visibility='visible'; sb.style.display='block'; }
 });
 </script>
 """, unsafe_allow_html=True)
@@ -2697,15 +2682,15 @@ with tab1:
 
                 df_results = pd.DataFrame(results)
 
-# Reorder columns: News pehle, phir LTP, phir OI data
-if not df_results.empty:
-    desired_order = [
-        'STOCK', 'SIGNAL', 'NEWS_ALERT', 'NEWS_DESC', 'LTP', 'CHG %',
-        'OI SPURT %', 'VOL RATIO', 'OI BUILDUP', 'OI SIGNAL',
-        'FILTERS', 'OI ALIGN', 'ACCURACY'
-    ]
-    remaining = [c for c in df_results.columns if c not in desired_order]
-    df_results = df_results[desired_order + remaining]
+                # Reorder columns: News first, then LTP, then OI data
+                if not df_results.empty:
+                    desired_order = [
+                        'STOCK', 'SIGNAL', 'NEWS_ALERT', 'NEWS_DESC', 'LTP', 'CHG %',
+                        'OI SPURT %', 'VOL RATIO', 'OI BUILDUP', 'OI SIGNAL',
+                        'FILTERS', 'OI ALIGN', 'ACCURACY'
+                    ]
+                    remaining = [c for c in df_results.columns if c not in desired_order]
+                    df_results = df_results[desired_order + remaining]
 
                 if signal_filter != "All Signals":
                     filter_map = {
