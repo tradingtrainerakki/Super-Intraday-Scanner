@@ -1389,10 +1389,27 @@ with st.sidebar:
     use_ema = st.checkbox("📈 EMA Filter", value=True)
     use_volume = st.checkbox("🔊 Volume Filter", value=True)
 
+    # Volume Ratio Threshold Slider
+    st.markdown("<div style='font-size:11px;color:#6a8aaa;margin:8px 0 4px;'>🔊 Min Volume Ratio</div>", unsafe_allow_html=True)
+    min_vol_ratio = st.slider("", 1.0, 5.0, 2.0, 0.5,
+                              help="Volume vs previous day avg (1.0x = same, 2.0x = double)",
+                              label_visibility="collapsed")
+    st.session_state.min_vol_ratio = min_vol_ratio
+    st.markdown(f"<div style='font-size:10px;color:#00d4ff;text-align:center;'>≥ {min_vol_ratio}x previous day</div>", unsafe_allow_html=True)
+
     st.markdown("<div class='section-h'>OI Analysis</div>", unsafe_allow_html=True)
     use_oi = st.checkbox("🎯 OI Buildup Analysis", value=True,
                          help="Long Buildup / Short Buildup / Short Cover / Long Unwind")
 
+    # OI Change % Threshold Slider
+    st.markdown("<div style='font-size:11px;color:#6a8aaa;margin:8px 0 4px;'>🎯 Min OI Change %</div>", unsafe_allow_html=True)
+    min_oi_change = st.slider("", 0, 50, 10, 5, 
+                              help="Minimum OI change % for signal strength",
+                              label_visibility="collapsed")
+    st.session_state.min_oi_change = min_oi_change
+    st.markdown(f"<div style='font-size:10px;color:#00d4ff;text-align:center;'>≥ {min_oi_change}% for STRONG signal</div>", unsafe_allow_html=True)
+
+    st.markdown("---")
     st.markdown("<div class='section-h'>Accuracy Mode</div>", unsafe_allow_html=True)
     accuracy_mode = st.select_slider("", 
         options=["Conservative (80%+)", "Balanced (70-80%)", "Aggressive (60-70%)"],
@@ -1913,7 +1930,7 @@ def analyze_stock_orb_oi(ticker, oi_info, orb_mins=15, gap_filter=True,
                 curr_vol = float(today_data['Volume'].sum())
                 expected_vol = prev_avg_vol * num_candles
                 vol_ratio = round(curr_vol / expected_vol, 1)
-                vol_pass = vol_ratio > 1.2
+                vol_pass = vol_ratio > st.session_state.get("min_vol_ratio", 2.0)
 
         # ── FILTER 5: GAP+SPIKE (already passed above) ──
         gap_pass = True
@@ -1965,10 +1982,10 @@ def analyze_stock_orb_oi(ticker, oi_info, orb_mins=15, gap_filter=True,
 
         if oi_up and price_up:
             oi_buildup = "🐂 LONG BUILDUP"
-            oi_signal = "STRONG LONG" if oi_pct > 15 else "LONG"
+            oi_signal = "STRONG LONG" if oi_pct > st.session_state.get("min_oi_change", 10) else "LONG"
         elif oi_up and not price_up:
             oi_buildup = "🐻 SHORT BUILDUP"
-            oi_signal = "STRONG SHORT" if oi_pct > 15 else "SHORT"
+            oi_signal = "STRONG SHORT" if oi_pct > st.session_state.get("min_oi_change", 10) else "SHORT"
         elif not oi_up and price_up:
             oi_buildup = "📤 SHORT COVERING"
             oi_signal = "SHORT SQUEEZE"
