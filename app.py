@@ -36,81 +36,27 @@ st.set_page_config(
 
 
 # ============================================================
-# AGGRESSIVE SIDEBAR COLLAPSE BUTTON HIDE
+# HIDE ONLY SIDEBAR COLLAPSE BUTTON (Streamlit 1.44+)
 # ============================================================
 st.markdown("""
 <style>
-/* Hide ALL sidebar toggle/collapse buttons - EVERY possible selector */
-[data-testid="stSidebarCollapseButton"],
-[data-testid="stSidebarCollapseControl"],
-[data-testid="stBaseButton-header"],
-button[kind="header"],
-button[data-testid="baseButton-header"],
-.css-1dp5vir,
-.css-17eq0hr,
-.css-1aehpvj,
-.css-1cpxqw2,
-.css-1hynsf2,
-.css-1avcm0n,
-.css-1rs6os,
-.css-1inwz65,
-.css-eczf16,
-.css-1l40rjl,
-.css-1p05t8d,
-.css-1q8dd3e,
-.css-1fcdlhv,
-.css-1v3fv5i,
-.css-1j7f08d,
-.css-1aehpvj,
-.css-1fcdlhv,
-.css-1q8dd3e,
-.css-1v3fv5i,
-.css-1j7f08d,
-.css-1hynsf2,
-.css-1avcm0n,
-.css-1rs6os,
-.css-1inwz65,
-.css-eczf16,
-.css-1l40rjl,
-.css-1p05t8d,
-.css-1aehpvj,
-.css-1fcdlhv,
-.css-1q8dd3e,
-.css-1v3fv5i,
-.css-1j7f08d,
-.css-1hynsf2,
-.css-1avcm0n,
-.css-1rs6os,
-.css-1inwz65,
-.css-eczf16,
-.css-1l40rjl,
-.css-1p05t8d {
+/* ONLY hide the sidebar collapse/expand toggle button */
+[data-testid="stBaseButton-header"] {
     display: none !important;
-    visibility: hidden !important;
-    opacity: 0 !important;
-    width: 0 !important;
-    height: 0 !important;
-    pointer-events: none !important;
 }
 
-/* Force sidebar to NEVER collapse */
+/* Keep sidebar always expanded */
 section[data-testid="stSidebar"] {
     transform: none !important;
     transition: none !important;
-    width: 320px !important;
-    min-width: 320px !important;
-    max-width: 320px !important;
-    margin-left: 0 !important;
-}
-
-/* Hide any button inside sidebar header area */
-[data-testid="stSidebar"] > div:first-child button,
-[data-testid="stSidebar"] button[aria-label*="collapse" i],
-[data-testid="stSidebar"] button[aria-label*="expand" i] {
-    display: none !important;
 }
 </style>
 """, unsafe_allow_html=True)
+
+
+
+
+
 
 
 
