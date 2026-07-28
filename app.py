@@ -135,6 +135,31 @@ if 'theme' not in st.session_state or st.session_state.theme not in THEMES:
     st.session_state.theme = "DARK"
 
 T = THEMES[st.session_state.theme]
+
+
+# ============================================================
+# HIDE SIDEBAR COLLAPSE BUTTON — PREVENT ACCIDENTAL HIDING
+# ============================================================
+st.markdown("""
+<style>
+/* Hide the sidebar collapse/expand button completely */
+[data-testid="stSidebarCollapseControl"] { display: none !important; }
+button[kind="header"] { display: none !important; }
+button[data-testid="baseButton-header"] { display: none !important; }
+.css-1dp5vir { display: none !important; }
+
+/* Force sidebar to always stay expanded */
+section[data-testid="stSidebar"] {
+    transform: none !important;
+    transition: none !important;
+    width: 320px !important;
+    min-width: 320px !important;
+    max-width: 320px !important;
+}
+</style>
+""", unsafe_allow_html=True)
+
+
 is_dark = st.session_state.theme in ["DARK", "MODERATE"]
 is_light = st.session_state.theme == "LIGHT"
 
