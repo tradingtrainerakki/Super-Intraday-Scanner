@@ -686,81 +686,12 @@ section[data-testid="stSidebar"] * {{
 # ============================================================
 st.markdown("""
 <style>
-/* EMERGENCY: Force sidebar visible */
+/* Sidebar always visible */
 section[data-testid="stSidebar"] {
     display: block !important;
-    width: 21rem !important;
-    min-width: 21rem !important;
-    max-width: 21rem !important;
     visibility: visible !important;
-    opacity: 1 !important;
 }
 
-/* Ensure sidebar toggle button is visible */
-[data-testid="stSidebarCollapsedControl"] {
-    display: flex !important;
-    visibility: visible !important;
-    opacity: 1 !important;
-    background: linear-gradient(135deg, #0d1a26, #111820) !important;
-    border: 1px solid #1e2d3d !important;
-    border-radius: 0 8px 8px 0 !important;
-    color: #00d4ff !important;
-    padding: 8px !important;
-    z-index: 999 !important;
-}
-
-[data-testid="stSidebarCollapsedControl"]:hover {
-    background: linear-gradient(135deg, #1a2436, #162030) !important;
-    border-color: #00d4ff55 !important;
-}
-
-[data-testid="stSidebarCollapsedControl"] svg {
-    color: #00d4ff !important;
-    fill: #00d4ff !important;
-}
-
-
-/* Expander hover - prevent white flash */
-.streamlit-expanderHeader:hover {
-    background: #1a2436 !important;
-    color: #00d4ff !important;
-}
-.streamlit-expanderContent:hover {
-    background: #080c12 !important;
-}
-
-/* Dataframe hover */
-[data-testid="stDataFrame"] tr:hover {
-    background: #0d1a26 !important;
-}
-
-/* Card hover */
-.metric-card-super:hover {
-    border-color: #00d4ff55 !important;
-}
-
-/* Scrollbar */
-::-webkit-scrollbar {
-    width: 8px; height: 8px;
-}
-::-webkit-scrollbar-track {
-    background: #0d1a26; border-radius: 4px;
-}
-::-webkit-scrollbar-thumb {
-    background: #1e2d3d; border-radius: 4px;
-}
-::-webkit-scrollbar-thumb:hover {
-    background: #00d4ff;
-}
-
-</style>
-""", unsafe_allow_html=True)
-
-# ============================================================
-# STREAMLIT COMPONENT COLOR OVERRIDES
-# ============================================================
-st.markdown("""
-<style>
 /* ============================================
    STREAMLIT DEFAULT COMPONENT OVERRIDES
    ============================================ */
@@ -1436,6 +1367,11 @@ with st.sidebar:
     </div>
     """, unsafe_allow_html=True)
 
+    if st.button("🚪 Logout", use_container_width=True):
+        st.session_state.authenticated = False
+        st.session_state.username = ""
+        st.rerun()
+
     st.markdown("---")
 
     # THEME SELECTOR
@@ -1619,13 +1555,6 @@ st.markdown(f"""
 """, unsafe_allow_html=True)
 
 # Logout button in header (top right)
-header_cols = st.columns([10, 1])
-with header_cols[1]:
-    if st.button("🚪", key="header_logout", help="Logout"):
-        st.session_state.authenticated = False
-        st.session_state.username = ""
-        st.rerun()
-
 # ============================================================
 # STOCK UNIVERSES
 # ============================================================
