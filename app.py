@@ -1452,21 +1452,107 @@ with st.sidebar:
 
     st.markdown("---")
 
-    # DHAN TOKEN
+    # DHAN API CONFIG
     if 'dhan_token' not in st.session_state:
         st.session_state.dhan_token = ''
+    if 'dhan_renew_token' not in st.session_state:
+        st.session_state.dhan_renew_token = ''
+    if 'dhan_token_expiry' not in st.session_state:
+        st.session_state.dhan_token_expiry = None
 
-    with st.expander("⚡ Dhan API (Optional)", expanded=False):
-        dhan_token = st.text_input("Access Token", 
-                                    value=st.session_state.dhan_token,
-                                    type="password",
-                                    placeholder="Paste Dhan token",
-                                    label_visibility="collapsed")
-        st.session_state.dhan_token = dhan_token
-        if dhan_token:
-            st.success("✅ Active")
+    with st.expander("⚡ Dhan API (Auto-Renew)", expanded=False):
+        st.markdown("<div style='font-size:11px;color:#6a8aaa;margin-bottom:8px;'>Auto-generate token using API Key + Secret + TOTP</div>", unsafe_allow_html=True)
+
+        dhan_api_key = st.text_input("API Key", 
+                                      value=st.session_state.get('dhan_api_key', ''),
+                                      type="password",
+                                      placeholder="Dhan API Key",
+                                      label_visibility="collapsed")
+        st.session_state.dhan_api_key = dhan_api_key
+
+        dhan_api_secret = st.text_input("API Secret", 
+                                         value=st.session_state.get('dhan_api_secret', ''),
+                                         type="password",
+                                         placeholder="Dhan API Secret",
+                                         label_visibility="collapsed")
+        st.session_state.dhan_api_secret = dhan_api_secret
+
+        dhan_totp = st.text_input("TOTP (6-digit)", 
+                                   value=st.session_state.get('dhan_totp', ''),
+                                   type="password",
+                                   placeholder="Current TOTP from Authenticator",
+                                   label_visibility="collapsed")
+        st.session_state.dhan_totp = dhan_totp
+
+        col1, col2 = st.columns(2)
+        with col1:
+            if st.button("🔑 Generate Token", use_container_width=True):
+                if dhan_api_key and dhan_api_secret and dhan_totp:
+                    with st.spinner("Authenticating with Dhan..."):
+                        try:
+                            resp = requests.post(
+                                "https://api.dhan.co/v2/login",
+                                json={
+                                    "apiKey": dhan_api_key,
+                                    "apiSecret": dhan_api_secret,
+                                    "totp": dhan_totp
+                                },
+                                timeout=15
+                            )
+                            if resp.status_code == 200:
+                                data = resp.json()
+                                st.session_state.dhan_token = data.get('accessToken', '')
+                                st.session_state.dhan_renew_token = data.get('refreshToken', '')
+                                st.session_state.dhan_token_expiry = data.get('expiry', None)
+                                st.success("✅ Token Generated!")
+                            else:
+                                st.error(f"❌ Failed: {resp.status_code}")
+                                st.caption(f"Response: {resp.text[:200]}")
+                        except Exception as e:
+                            st.error(f"❌ Error: {str(e)}")
+                else:
+                    st.warning("⚠️ Fill all 3 fields!")
+
+        with col2:
+            if st.button("🔄 Renew Token", use_container_width=True):
+                if st.session_state.dhan_renew_token:
+                    with st.spinner("Renewing token..."):
+                        try:
+                            resp = requests.post(
+                                "https://api.dhan.co/v2/renew-token",
+                                json={"refreshToken": st.session_state.dhan_renew_token},
+                                timeout=15
+                            )
+                            if resp.status_code == 200:
+                                data = resp.json()
+                                st.session_state.dhan_token = data.get('accessToken', '')
+                                st.session_state.dhan_renew_token = data.get('refreshToken', st.session_state.dhan_renew_token)
+                                st.session_state.dhan_token_expiry = data.get('expiry', None)
+                                st.success("✅ Token Renewed!")
+                            else:
+                                st.error(f"❌ Renew Failed: {resp.status_code}")
+                        except Exception as e:
+                            st.error(f"❌ Error: {str(e)}")
+                else:
+                    st.warning("⚠️ Generate token first!")
+
+        # Manual token fallback
+        st.markdown("<div style='font-size:10px;color:#3a5a7a;margin-top:8px;'>— OR paste manually —</div>", unsafe_allow_html=True)
+        manual_token = st.text_input("Access Token (Manual)", 
+                                      value=st.session_state.dhan_token,
+                                      type="password",
+                                      placeholder="Paste token if auto fails",
+                                      label_visibility="collapsed")
+        if manual_token:
+            st.session_state.dhan_token = manual_token
+
+        # Show status
+        if st.session_state.dhan_token:
+            st.success("✅ Token Active")
+            if st.session_state.dhan_token_expiry:
+                st.caption(f"Expires: {st.session_state.dhan_token_expiry}")
         else:
-            st.caption("Blank = Yahoo Finance")
+            st.caption("🔴 No token — using Yahoo Finance")
 
     st.markdown("---")
     refresh = st.button("🚀 SCAN NOW", type="primary", use_container_width=True)
