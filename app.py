@@ -2037,7 +2037,7 @@ def analyze_stock_orb_oi(ticker, oi_info, orb_mins=15, gap_filter=True,
         prev_data = df[df.index.date < today]
 
         if len(today_data) < 2:
-            all_dates = sorted(df.index.date.unique())
+            all_dates = sorted(pd.Series(df.index.date).unique())
             if len(all_dates) < 2:
                 return None, "No previous data"
             today_data = df[df.index.date == all_dates[-1]]
