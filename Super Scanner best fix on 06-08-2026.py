@@ -2090,6 +2090,53 @@ def analyze_stock_orb_oi(ticker, oi_info, orb_mins=15, gap_filter=True,
         # current_candle hamesha cutoff window ki AAKHRI candle hai
         # (chahe aap kisi bhi time scan karo, ye candle fixed rahegi
         # jab tak orb_mins/breakout_valid_cutoff change na ho)
+        # ── BOTH SIDE ORB: Check EVERY candle in breakout window ──
+        # Pehle breakout/breakdown kab hua — last candle se check nahi
+        breakout_time = None
+        breakdown_time = None
+        breakout_price = None
+        breakdown_price = None
+
+        for idx, row in breakout_window_data.iterrows():
+            c = float(row['Close'])
+            if c > orb_high and breakout_time is None:
+                breakout_time = idx
+                breakout_price = c
+            if c < orb_low and breakdown_time is None:
+                breakdown_time = idx
+                breakdown_price = c
+
+        # Dono side mein se jo PEHLE hua woh valid signal
+        base_signal = None
+        entry_price = None
+        stop_loss = None
+        orb_break_time = None
+
+        if breakout_time is not None and breakdown_time is not None:
+            if breakout_time < breakdown_time:
+                base_signal = "BUY"
+                entry_price = orb_high
+                stop_loss = orb_low
+                orb_break_time = breakout_time
+            else:
+                base_signal = "SELL"
+                entry_price = orb_low
+                stop_loss = orb_high
+                orb_break_time = breakdown_time
+        elif breakout_time is not None:
+            base_signal = "BUY"
+            entry_price = orb_high
+            stop_loss = orb_low
+            orb_break_time = breakout_time
+        elif breakdown_time is not None:
+            base_signal = "SELL"
+            entry_price = orb_low
+            stop_loss = orb_high
+            orb_break_time = breakdown_time
+        else:
+            return None, "No ORB breakout"
+
+        # Latest candle for VWAP/EMA/volume filters (breakout ke baad ka bhi)
         current_candle = breakout_window_data.iloc[-1]
         current_price = float(current_candle['Close'])
 
@@ -2109,17 +2156,6 @@ def analyze_stock_orb_oi(ticker, oi_info, orb_mins=15, gap_filter=True,
         first_candle_move = abs(first_candle_close - prev_close) / prev_close * 100
         if gap_filter and first_candle_move >= 2.0:
             return None, f"Spike filter: {first_candle_move:.1f}%"
-
-        if current_price > orb_high:
-            base_signal = "BUY"
-            entry_price = orb_high
-            stop_loss = orb_low
-        elif current_price < orb_low:
-            base_signal = "SELL"
-            entry_price = orb_low
-            stop_loss = orb_high
-        else:
-            return None, "No ORB breakout"
 
         # ── FILTER 2: VWAP ──
         vwap = calculate_vwap(today_data)
@@ -2151,7 +2187,7 @@ def analyze_stock_orb_oi(ticker, oi_info, orb_mins=15, gap_filter=True,
         # ── ACCURACY CALCULATION ──
         filters_passed = 1  # ORB always passed
         total_filters = 1
-        filter_details = [("ORB Breakout", True, f"Price broke {base_signal}")]
+        filter_details = [("ORB Breakout", True, f"Price broke {base_signal} @ {orb_break_time.strftime('%H:%M') if orb_break_time else 'N/A'}")]
 
         if vwap_filter:
             total_filters += 1
@@ -2281,6 +2317,7 @@ def analyze_stock_orb_oi(ticker, oi_info, orb_mins=15, gap_filter=True,
             "OI SIGNAL": oi_signal,
             "OI ALIGN": "✅ ALIGNED" if oi_alignment > 0 else "⚠️ CONFLICT" if oi_alignment < 0 else "➖ NEUTRAL",
             "SECTOR": STOCK_TO_SECTOR.get(ticker, "—"),
+            "ORB_BREAK_TIME": str(orb_break_time.strftime("%H:%M")) if orb_break_time else "N/A",
             "DATA_SOURCE": source.upper(),
             "filter_details": filter_details,
             "vwap_val": round(vwap, 2) if vwap else None,
