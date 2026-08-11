@@ -2091,54 +2091,70 @@ def analyze_stock_orb_oi(ticker, oi_info, orb_mins=15, gap_filter=True,
         # (chahe aap kisi bhi time scan karo, ye candle fixed rahegi
         # jab tak orb_mins/breakout_valid_cutoff change na ho)
         # ── BOTH SIDE ORB: Check EVERY candle in breakout window ──
-        # Pehle breakout/breakdown kab hua — last candle se check nahi
-        breakout_time = None
-        breakdown_time = None
-        breakout_price = None
-        breakdown_price = None
+        # Step 1: Current price kahan hai? (Active breakout)
+        current_candle = breakout_window_data.iloc[-1]
+        current_price = float(current_candle['Close'])
 
-        for idx, row in breakout_window_data.iterrows():
-            c = float(row['Close'])
-            if c > orb_high and breakout_time is None:
-                breakout_time = idx
-                breakout_price = c
-            if c < orb_low and breakdown_time is None:
-                breakdown_time = idx
-                breakdown_price = c
-
-        # Dono side mein se jo PEHLE hua woh valid signal
         base_signal = None
         entry_price = None
         stop_loss = None
         orb_break_time = None
+        orb_retraced = False
 
-        if breakout_time is not None and breakdown_time is not None:
-            if breakout_time < breakdown_time:
+        # Agar current price range ke bahar hai → immediate signal
+        if current_price > orb_high:
+            base_signal = "BUY"
+            entry_price = orb_high
+            stop_loss = orb_low
+        elif current_price < orb_low:
+            base_signal = "SELL"
+            entry_price = orb_low
+            stop_loss = orb_high
+        else:
+            # Step 2: Current price range ke andar hai → historical breakout check karo
+            # Sabse RECENT breakout kaun sa tha?
+            breakout_time = None
+            breakdown_time = None
+            last_breakout_price = None
+            last_breakdown_price = None
+
+            for idx, row in breakout_window_data.iterrows():
+                c = float(row['Close'])
+                if c > orb_high:
+                    breakout_time = idx      # Har baar update karo = last wala milega
+                    last_breakout_price = c
+                if c < orb_low:
+                    breakdown_time = idx     # Har baar update karo = last wala milega
+                    last_breakdown_price = c
+
+            # Most recent breakout decide karo
+            if breakout_time is not None and breakdown_time is not None:
+                if breakout_time > breakdown_time:
+                    base_signal = "BUY"
+                    entry_price = orb_high
+                    stop_loss = orb_low
+                    orb_break_time = breakout_time
+                    orb_retraced = True
+                else:
+                    base_signal = "SELL"
+                    entry_price = orb_low
+                    stop_loss = orb_high
+                    orb_break_time = breakdown_time
+                    orb_retraced = True
+            elif breakout_time is not None:
                 base_signal = "BUY"
                 entry_price = orb_high
                 stop_loss = orb_low
                 orb_break_time = breakout_time
-            else:
+                orb_retraced = True
+            elif breakdown_time is not None:
                 base_signal = "SELL"
                 entry_price = orb_low
                 stop_loss = orb_high
                 orb_break_time = breakdown_time
-        elif breakout_time is not None:
-            base_signal = "BUY"
-            entry_price = orb_high
-            stop_loss = orb_low
-            orb_break_time = breakout_time
-        elif breakdown_time is not None:
-            base_signal = "SELL"
-            entry_price = orb_low
-            stop_loss = orb_high
-            orb_break_time = breakdown_time
-        else:
-            return None, "No ORB breakout"
-
-        # Latest candle for VWAP/EMA/volume filters (breakout ke baad ka bhi)
-        current_candle = breakout_window_data.iloc[-1]
-        current_price = float(current_candle['Close'])
+                orb_retraced = True
+            else:
+                return None, "No ORB breakout"
 
         # Baaki calculations (VWAP/Volume/ATR) bhi isi cutoff tak cap karo
         # taaki wo bhi scan-time-independent rahein
@@ -2187,7 +2203,8 @@ def analyze_stock_orb_oi(ticker, oi_info, orb_mins=15, gap_filter=True,
         # ── ACCURACY CALCULATION ──
         filters_passed = 1  # ORB always passed
         total_filters = 1
-        filter_details = [("ORB Breakout", True, f"Price broke {base_signal} @ {orb_break_time.strftime('%H:%M') if orb_break_time else 'N/A'}")]
+        retrace_note = " [RETRACED]" if orb_retraced else ""
+            filter_details = [("ORB Breakout", True, f"Price broke {base_signal} @ {orb_break_time.strftime('%H:%M') if orb_break_time else 'N/A'}{retrace_note}")]
 
         if vwap_filter:
             total_filters += 1
@@ -2317,6 +2334,7 @@ def analyze_stock_orb_oi(ticker, oi_info, orb_mins=15, gap_filter=True,
             "OI SIGNAL": oi_signal,
             "OI ALIGN": "✅ ALIGNED" if oi_alignment > 0 else "⚠️ CONFLICT" if oi_alignment < 0 else "➖ NEUTRAL",
             "SECTOR": STOCK_TO_SECTOR.get(ticker, "—"),
+            "ORB_RETRACED": orb_retraced,
             "ORB_BREAK_TIME": str(orb_break_time.strftime("%H:%M")) if orb_break_time else "N/A",
             "DATA_SOURCE": source.upper(),
             "filter_details": filter_details,
