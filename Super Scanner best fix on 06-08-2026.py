@@ -2204,7 +2204,7 @@ def analyze_stock_orb_oi(ticker, oi_info, orb_mins=15, gap_filter=True,
         filters_passed = 1  # ORB always passed
         total_filters = 1
         retrace_note = " [RETRACED]" if orb_retraced else ""
-            filter_details = [("ORB Breakout", True, f"Price broke {base_signal} @ {orb_break_time.strftime('%H:%M') if orb_break_time else 'N/A'}{retrace_note}")]
+        filter_details = [("ORB Breakout", True, f"Price broke {base_signal} @ {orb_break_time.strftime('%H:%M') if orb_break_time else 'N/A'}{retrace_note}")]
 
         if vwap_filter:
             total_filters += 1
