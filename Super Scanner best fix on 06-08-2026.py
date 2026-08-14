@@ -1449,6 +1449,16 @@ with st.sidebar:
     st.session_state.min_oi_change = min_oi_change
     st.markdown(f"<div style='font-size:10px;color:#00d4ff;text-align:center;'>≥ {min_oi_change}% for STRONG signal</div>", unsafe_allow_html=True)
 
+    # Min Absolute OI Slider (liquidity filter)
+    st.markdown("<div style='font-size:11px;color:#6a8aaa;margin:8px 0 4px;'>💧 Min Absolute OI (Liquidity)</div>", unsafe_allow_html=True)
+    min_absolute_oi = st.slider("", 100, 5000, 500, 100,
+                              help="Isse kam absolute OI (contracts) wale stocks 'LOW LIQUIDITY ⚠️' tag "
+                                   "ke saath dikhenge — chahe unka OI% badha hua kyun na dikhe, kyunki "
+                                   "chhoti base OI par bada % noise ho sakta hai.",
+                              label_visibility="collapsed")
+    st.session_state.min_absolute_oi = min_absolute_oi
+    st.markdown(f"<div style='font-size:10px;color:#00d4ff;text-align:center;'>≥ {min_absolute_oi:,} contracts</div>", unsafe_allow_html=True)
+
     st.markdown("---")
     st.markdown("<div class='section-h'>Accuracy Mode</div>", unsafe_allow_html=True)
     accuracy_mode = st.select_slider("", 
@@ -1879,12 +1889,18 @@ def get_oi_spurts_nsepython():
                         latest_oi = item.get('latestOI', 
                                     item.get('openInterest', 0)) or 0
 
-                        chg_oi = item.get('changeinOpenInterest',
-                                 item.get('changeInOpenInterest', 0)) or 0
+                        # NSE ka raw changeinOpenInterest field market-closed
+                        # hours mein 0 aata hai (sirf live session mein
+                        # populate hota hai) — isliye khud calculate karo,
+                        # taaki after-hours bhi sahi dikhe
+                        chg_oi = float(latest_oi) - float(prev_oi)
 
                         # Calculate OI change % if not provided
+                        oi_data_quality = 'exact'
                         if float(pchg) == 0 and float(prev_oi) > 0 and float(latest_oi) > 0:
                             pchg = round(((float(latest_oi) - float(prev_oi)) / float(prev_oi)) * 100, 2)
+                        elif float(prev_oi) <= 0:
+                            oi_data_quality = 'estimated'
 
                         items.append({
                             'symbol': sym,
@@ -1892,6 +1908,7 @@ def get_oi_spurts_nsepython():
                             'prev_oi': int(prev_oi),
                             'latest_oi': int(latest_oi),
                             'chg_oi': int(chg_oi),
+                            'oi_data_quality': oi_data_quality,
                         })
 
                     if items:
@@ -1954,7 +1971,9 @@ def get_oi_spurts_direct():
                     pchg = item.get('pchangeinOpenInterest', item.get('pChange', 0)) or 0
                     prev_oi = item.get('prevOI', 0) or 0
                     latest_oi = item.get('latestOI', 0) or 0
-                    chg_oi = item.get('changeinOpenInterest', 0) or 0
+                    # NSE ka raw changeinOpenInterest field market-closed
+                    # hours mein 0 aata hai — isliye khud calculate karo
+                    chg_oi = float(latest_oi) - float(prev_oi)
 
                     items.append({
                         'symbol': sym,
@@ -1962,6 +1981,7 @@ def get_oi_spurts_direct():
                         'prev_oi': int(prev_oi),
                         'latest_oi': int(latest_oi),
                         'chg_oi': int(chg_oi),
+                        'oi_data_quality': 'exact' if float(prev_oi) > 0 else 'estimated',
                     })
 
                 if items:
@@ -2754,18 +2774,30 @@ with tab1:
             else:
                 st.success(f"✅ OI Spurts loaded via {oi_source}! Top: {oi_list[0]['symbol']} (+{oi_list[0]['oi_chg_pct']:.2f}%)")
 
+                _min_abs_oi = st.session_state.get('min_absolute_oi', 500)
+                low_liq_count = sum(1 for x in oi_list[:20]
+                                     if x.get('latest_oi', 0) < _min_abs_oi or x.get('prev_oi', 0) < _min_abs_oi)
+                if low_liq_count:
+                    st.warning(f"⚠️ {low_liq_count}/{len(oi_list[:20])} stocks LOW LIQUIDITY hain "
+                               f"(absolute OI < {_min_abs_oi:,} contracts) — inka OI% bada dikh sakta hai, "
+                               f"par size chhota liya jaye.")
+
                 # Show OI preview
                 oi_preview = pd.DataFrame([{
                     'RANK': i+1,
                     'SYMBOL': x['symbol'],
-                    'OI CHANGE %': f"{'🟢' if x['oi_chg_pct'] >= 0 else '🔴'} {x['oi_chg_pct']:+.2f}%",
+                    'OI CHANGE %': (f"{'🟢' if x['oi_chg_pct'] >= 0 else '🔴'} {x['oi_chg_pct']:+.2f}%")
+                                   + (" ~est" if x.get('oi_data_quality') == 'estimated' else ""),
                     'PREV OI': f"{x['prev_oi']:,}",
                     'LATEST OI': f"{x['latest_oi']:,}",
                     'CHG OI': f"{x['chg_oi']:+,}",
+                    'LIQUIDITY': "⚠️ LOW" if (x.get('latest_oi', 0) < _min_abs_oi or x.get('prev_oi', 0) < _min_abs_oi) else "✅ OK",
                 } for i, x in enumerate(oi_list[:20])])
 
                 with st.expander("📊 NSE OI Spurts Raw Data", expanded=False):
                     st.dataframe(oi_preview, use_container_width=True, hide_index=True)
+                    st.caption("**~est** = prev-day OI 0/missing tha, isliye NSE ka pchg fallback use hua "
+                               "(real calculated % nahi). **⚠️ LOW** = absolute OI threshold se kam, illiquid contract.")
 
                 # Determine stock list based on mode
                 if "QUICK" in scan_mode:
