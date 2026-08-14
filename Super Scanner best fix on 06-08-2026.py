@@ -2072,12 +2072,18 @@ def analyze_stock_orb_oi(ticker, oi_info, orb_mins=15, gap_filter=True,
         breakout_cutoff_min = st.session_state.get("breakout_valid_cutoff", 15)
         valid_till_dt = range_close_dt + timedelta(minutes=breakout_cutoff_min)
 
-        opening_range = today_data[today_data.index <= range_close_dt]
+        # FIX: opening_range strictly range_close_dt SE PEHLE tak honi chahiye
+        # (< , <= nahi) — warna jab orb_mins candle-interval ka multiple ho
+        # (5, 15, 30...), to "agli" candle (jo breakout confirm karti hai)
+        # galti se range me hi mix ho jaati thi, aur breakout detect karna
+        # lagbhag impossible ho jaata tha (kyunki wahi candle range bana rahi
+        # hoti thi). Ab range aur breakout candle strictly alag hain.
+        opening_range = today_data[today_data.index < range_close_dt]
         if opening_range.empty:
             return None, "ORB range still forming"
 
-        # Breakout sirf range close hone ke baad se cutoff tak ke data mein dhoondo
-        breakout_window_data = today_data[(today_data.index > range_close_dt) & (today_data.index <= valid_till_dt)]
+        # Breakout sirf range close hone ke turant baad (>=) se cutoff tak
+        breakout_window_data = today_data[(today_data.index >= range_close_dt) & (today_data.index <= valid_till_dt)]
 
         if breakout_window_data.empty:
             if today_data.index[-1] <= range_close_dt:
