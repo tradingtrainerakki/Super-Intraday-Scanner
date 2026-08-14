@@ -2180,7 +2180,14 @@ def analyze_stock_orb_oi(ticker, oi_info, orb_mins=15, gap_filter=True,
             vwap_pass = (base_signal == "BUY" and current_price > vwap) or                        (base_signal == "SELL" and current_price < vwap)
 
         # ── FILTER 3: EMA ──
-        ema20 = float(ema(df['Close'], 20).iloc[-1])
+        # NOTE: EMA ab poore live df par nahi, balki valid_till_dt tak
+        # capped df par nikalta hai — taaki scan chahe 9:20 AM ho ya 1 PM,
+        # EMA hamesha wahi fixed value de (jaise baaki sab kuch already
+        # valid_till_dt tak capped hai). Multi-day history isliye rakhi
+        # gayi hai kyunki sirf aaj ke 6-10 candles se EMA20 theek se
+        # smooth nahi hota.
+        df_for_ema = df[df.index <= valid_till_dt]
+        ema20 = float(ema(df_for_ema['Close'], 20).iloc[-1])
         ema_pass = False
         if ema_filter:
             ema_pass = (base_signal == "BUY" and current_price > ema20) or                       (base_signal == "SELL" and current_price < ema20)
@@ -2242,6 +2249,12 @@ def analyze_stock_orb_oi(ticker, oi_info, orb_mins=15, gap_filter=True,
         target = entry_price + (risk * risk_reward) if base_signal == "BUY" else entry_price - (risk * risk_reward)
 
         # ── OI BUILDUP CLASSIFICATION ──
+        # NOTE: price_up ab AAJ ke open ke against nikalta hai (intraday/ORB
+        # context), prev_close ke against nahi — kyunki ORB signal khud
+        # intraday breakout par based hai, poore din ke prev-close-vs-now
+        # trend par nahi. Isse SELL side ORB signals bhi fairly align ho
+        # paate hain jab stock kal ke close se abhi bhi green ho lekin aaj
+        # ke open se neeche trade kar raha ho.
         oi_pct = oi_info.get('oi_chg_pct', 0)
 
         # ── STRICT FILTER: Skip if Volume or OI below threshold ──
@@ -2256,7 +2269,7 @@ def analyze_stock_orb_oi(ticker, oi_info, orb_mins=15, gap_filter=True,
                 return None, f"OI filter: {abs(oi_pct)}% < {min_oi}%"
 
         oi_up = oi_pct > 0
-        price_up = ((current_price - prev_close) / prev_close * 100) > 0
+        price_up = current_price > today_open
 
         if oi_up and price_up:
             oi_buildup = "🐂 LONG BUILDUP"
