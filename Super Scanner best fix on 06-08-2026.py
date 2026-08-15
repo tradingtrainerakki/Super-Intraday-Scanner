@@ -162,10 +162,10 @@ is_light = st.session_state.theme == "LIGHT"
 
 # Determine text colors based on theme
 if is_dark:
-    text_primary = "#e8f0f8"      # Very light blue-white
-    text_secondary = "#a0b8d0"   # Light blue-gray
-    text_muted = "#6a8aaa"       # Medium blue-gray
-    text_dark = "#3a5a7a"         # Dark blue-gray
+    text_primary = "#f0f6fc"      # Very light blue-white (brighter for clarity)
+    text_secondary = "#b8d0e8"   # Light blue-gray (brightened)
+    text_muted = "#9fc4e8"       # Medium blue-gray (brightened from #6a8aaa)
+    text_dark = "#7fa8cf"         # Dark blue-gray (brightened from #3a5a7a)
     bg_primary = T['bg_main']     # Main background
     bg_card = T['bg_card']        # Card background
     bg_card_alt = T['bg_card_alt'] # Alt card background
@@ -182,10 +182,10 @@ if is_dark:
     badge_text_light = "#000000"
     badge_text_dark = "#ffffff"
 else:
-    text_primary = "#1a2332"      # Very dark blue
-    text_secondary = "#3a4a5a"    # Dark gray-blue
-    text_muted = "#6a7a8a"       # Medium gray
-    text_dark = "#9aaab8"         # Light gray
+    text_primary = "#0a1420"      # Very dark blue (darker for more contrast)
+    text_secondary = "#1e2e3e"    # Dark gray-blue (darkened)
+    text_muted = "#3a5468"       # Medium gray (darkened from #6a7a8a)
+    text_dark = "#6a8298"         # Light gray (darkened from #9aaab8)
     bg_primary = T['bg_main']
     bg_card = T['bg_card']
     bg_card_alt = T['bg_card_alt']
@@ -232,6 +232,21 @@ section[data-testid="stSidebar"] * {{
 
 /* Hide default menus */
 #MainMenu, footer, header {{ visibility: hidden !important; }}
+
+/* Header hide karne se sidebar ka expand/collapse arrow (>>) bhi chhup
+   jaata hai kyunki wo header toolbar ke andar hota hai — isliye use
+   explicitly wapas visible aur clickable karo */
+[data-testid="collapsedControl"] {{
+    visibility: visible !important;
+    display: block !important;
+    position: fixed !important;
+    top: 10px !important;
+    left: 10px !important;
+    z-index: 999999 !important;
+}}
+[data-testid="collapsedControl"] svg {{
+    fill: #00d4ff !important;
+}}
 
 /* ============================================
    HEADER
@@ -831,17 +846,19 @@ st.markdown("""
     font-size: 11px !important;
 }
 .stCaption > div {
-    color: #6a8aaa !important;
+    color: #9fc4e8 !important;
 }
 
 /* Text input placeholder */
 .stTextInput > div > div > input::placeholder {
-    color: #3a5a7a !important;
+    color: #7fa8cf !important;
+    opacity: 1 !important;
 }
 
 /* Number input placeholder */
 .stNumberInput > div > div > input::placeholder {
-    color: #3a5a7a !important;
+    color: #7fa8cf !important;
+    opacity: 1 !important;
 }
 
 /* Selectbox placeholder */
