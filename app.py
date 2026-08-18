@@ -162,10 +162,10 @@ is_light = st.session_state.theme == "LIGHT"
 
 # Determine text colors based on theme
 if is_dark:
-    text_primary = "#f0f6fc"      # Very light blue-white (brighter for clarity)
-    text_secondary = "#b8d0e8"   # Light blue-gray (brightened)
-    text_muted = "#9fc4e8"       # Medium blue-gray (brightened from #6a8aaa)
-    text_dark = "#7fa8cf"         # Dark blue-gray (brightened from #3a5a7a)
+    text_primary = "#e8f0f8"      # Very light blue-white
+    text_secondary = "#a0b8d0"   # Light blue-gray
+    text_muted = "#6a8aaa"       # Medium blue-gray
+    text_dark = "#3a5a7a"         # Dark blue-gray
     bg_primary = T['bg_main']     # Main background
     bg_card = T['bg_card']        # Card background
     bg_card_alt = T['bg_card_alt'] # Alt card background
@@ -182,10 +182,10 @@ if is_dark:
     badge_text_light = "#000000"
     badge_text_dark = "#ffffff"
 else:
-    text_primary = "#0a1420"      # Very dark blue (darker for more contrast)
-    text_secondary = "#1e2e3e"    # Dark gray-blue (darkened)
-    text_muted = "#3a5468"       # Medium gray (darkened from #6a7a8a)
-    text_dark = "#6a8298"         # Light gray (darkened from #9aaab8)
+    text_primary = "#1a2332"      # Very dark blue
+    text_secondary = "#3a4a5a"    # Dark gray-blue
+    text_muted = "#6a7a8a"       # Medium gray
+    text_dark = "#9aaab8"         # Light gray
     bg_primary = T['bg_main']
     bg_card = T['bg_card']
     bg_card_alt = T['bg_card_alt']
@@ -232,21 +232,6 @@ section[data-testid="stSidebar"] * {{
 
 /* Hide default menus */
 #MainMenu, footer, header {{ visibility: hidden !important; }}
-
-/* Header hide karne se sidebar ka expand/collapse arrow (>>) bhi chhup
-   jaata hai kyunki wo header toolbar ke andar hota hai — isliye use
-   explicitly wapas visible aur clickable karo */
-[data-testid="collapsedControl"] {{
-    visibility: visible !important;
-    display: block !important;
-    position: fixed !important;
-    top: 10px !important;
-    left: 10px !important;
-    z-index: 999999 !important;
-}}
-[data-testid="collapsedControl"] svg {{
-    fill: #00d4ff !important;
-}}
 
 /* ============================================
    HEADER
@@ -846,19 +831,17 @@ st.markdown("""
     font-size: 11px !important;
 }
 .stCaption > div {
-    color: #9fc4e8 !important;
+    color: #6a8aaa !important;
 }
 
 /* Text input placeholder */
 .stTextInput > div > div > input::placeholder {
-    color: #7fa8cf !important;
-    opacity: 1 !important;
+    color: #3a5a7a !important;
 }
 
 /* Number input placeholder */
 .stNumberInput > div > div > input::placeholder {
-    color: #7fa8cf !important;
-    opacity: 1 !important;
+    color: #3a5a7a !important;
 }
 
 /* Selectbox placeholder */
@@ -1941,22 +1924,33 @@ def get_oi_spurts_nsepython():
     return None, "all endpoints failed"
 
 def get_oi_spurts_direct():
-    """Fallback: Direct NSE requests — lightweight single-hit session
-    (F&O Pro Scanner jaisa hi proven approach — 3 pages visit karne ki
-    jagah sirf homepage ek baar hit karke seedha API call karta hai,
-    isse tez bhi hai aur NSE ke bot-detection ko kam suspicious lagta hai)"""
+    """Fallback: Direct NSE requests with session management"""
     try:
         session = requests.Session()
         headers = {
-            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/124.0.0.0 Safari/537.36",
-            "Accept": "*/*", "Accept-Language": "en-US,en;q=0.9",
-            "Referer": "https://www.nseindia.com/", "Connection": "keep-alive",
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36',
+            'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
+            'Accept-Language': 'en-US,en;q=0.9',
+            'Accept-Encoding': 'gzip, deflate, br',
+            'Connection': 'keep-alive',
+            'Upgrade-Insecure-Requests': '1',
         }
-        session.headers.update(headers)
-        try:
-            session.get("https://www.nseindia.com", timeout=10)
-        except:
-            pass
+
+        session.get('https://www.nseindia.com', headers=headers, timeout=15)
+        time.sleep(1)
+        session.get('https://www.nseindia.com/market-data', headers=headers, timeout=15)
+        time.sleep(1)
+        session.get('https://www.nseindia.com/market-data/oi-spurts', headers=headers, timeout=15)
+        time.sleep(1)
+
+        api_headers = {
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
+            'Accept': 'application/json, text/plain, */*',
+            'Accept-Language': 'en-US,en;q=0.9',
+            'Referer': 'https://www.nseindia.com/market-data/oi-spurts',
+            'X-Requested-With': 'XMLHttpRequest',
+            'Connection': 'keep-alive',
+        }
 
         endpoints = [
             "https://www.nseindia.com/api/live-analysis-oi-spurts-underlyings",
@@ -1964,7 +1958,7 @@ def get_oi_spurts_direct():
         ]
 
         for endpoint in endpoints:
-            response = session.get(endpoint, timeout=15)
+            response = session.get(endpoint, headers=api_headers, timeout=15)
             if response.status_code == 200:
                 data = response.json()
                 items = []
@@ -2000,18 +1994,14 @@ def get_oi_spurts_direct():
     return None, "direct failed"
 
 def get_oi_spurts():
-    """Unified OI Spurts fetcher — lean 'direct' approach (F&O Pro
-    Scanner jaisa, proven, single-hit) pehle try hota hai; nsepython
-    sirf backup ke liye hai. Pehle nsepython pehle try karne se har
-    click par NSE ko double requests jaate the (nsepython + direct dono),
-    jisse rate-limit/block jaldi lagta tha — isliye order palat diya."""
-    # Method 1: Direct requests (lean, proven — F&O scanner jaisa)
-    result, source = get_oi_spurts_direct()
+    """Unified OI Spurts fetcher - tries nsepython first, then direct"""
+    # Method 1: nsepython
+    result, source = get_oi_spurts_nsepython()
     if result:
         return result, source
 
-    # Method 2: nsepython (backup only, agar direct fail ho)
-    result, source = get_oi_spurts_nsepython()
+    # Method 2: Direct requests
+    result, source = get_oi_spurts_direct()
     if result:
         return result, source
 
@@ -2772,10 +2762,7 @@ with tab1:
     # SCAN BUTTON
     if refresh or 'scan_results' not in st.session_state:
         if refresh:
-            # Get OI Spurts — sirf ek attempt (auto-retry jaanbujh kar
-            # nahi rakha, taaki rapid repeated requests se NSE poori
-            # tarah block na kar de). Fail ho to user khud dobara
-            # "SCAN NOW" dabaye, thoda gap dekar.
+            # Get OI Spurts
             with st.spinner("🔍 Fetching NSE OI Spurts data..."):
                 oi_list, oi_source = get_oi_spurts()
                 st.session_state['oi_list'] = oi_list
@@ -2807,7 +2794,7 @@ with tab1:
                     'LIQUIDITY': "⚠️ LOW" if (x.get('latest_oi', 0) < _min_abs_oi or x.get('prev_oi', 0) < _min_abs_oi) else "✅ OK",
                 } for i, x in enumerate(oi_list[:20])])
 
-                with st.expander("📊 NSE OI Spurts Raw Data", expanded=True):
+                with st.expander("📊 NSE OI Spurts Raw Data", expanded=False):
                     st.dataframe(oi_preview, use_container_width=True, hide_index=True)
                     st.caption("**~est** = prev-day OI 0/missing tha, isliye NSE ka pchg fallback use hua "
                                "(real calculated % nahi). **⚠️ LOW** = absolute OI threshold se kam, illiquid contract.")
