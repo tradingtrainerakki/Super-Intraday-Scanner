@@ -1896,9 +1896,10 @@ def get_oi_spurts_nsepython():
                         if not sym:
                             continue
 
-                        pchg = item.get('pchangeinOpenInterest', 
+                        pchg = item.get('avgInOI',
+                               item.get('pchangeinOpenInterest', 
                                item.get('pChange', 
-                               item.get('pchangeinOi', 0))) or 0
+                               item.get('pchangeinOi', 0)))) or 0
 
                         prev_oi = item.get('prevOI', 
                                   item.get('previousOI', 0)) or 0
@@ -1974,20 +1975,34 @@ def get_oi_spurts_direct():
                     sym = item.get('symbol', '')
                     if not sym:
                         continue
-                    pchg = item.get('pchangeinOpenInterest', item.get('pChange', 0)) or 0
+                    # NSE ka % field ka naam responses mein badalta rehta
+                    # hai (avgInOI / pchangeinOpenInterest / pChange) —
+                    # isliye raw field par depend karne ki bajaye hamesha
+                    # khud (latest-prev)/prev*100 se calculate karo, jo
+                    # kisi bhi field-naming se independent hai
+                    pchg = item.get('avgInOI', item.get('pchangeinOpenInterest', item.get('pChange', 0))) or 0
                     prev_oi = item.get('prevOI', 0) or 0
                     latest_oi = item.get('latestOI', 0) or 0
+                    prev_oi_f, latest_oi_f = float(prev_oi), float(latest_oi)
+
                     # NSE ka raw changeinOpenInterest field market-closed
                     # hours mein 0 aata hai — isliye khud calculate karo
-                    chg_oi = float(latest_oi) - float(prev_oi)
+                    chg_oi = latest_oi_f - prev_oi_f
+
+                    if prev_oi_f > 0:
+                        oi_chg_pct = round((latest_oi_f - prev_oi_f) / prev_oi_f * 100, 2)
+                        data_quality = 'exact'
+                    else:
+                        oi_chg_pct = round(float(pchg), 2)
+                        data_quality = 'estimated'
 
                     items.append({
                         'symbol': sym,
-                        'oi_chg_pct': round(float(pchg), 2),
+                        'oi_chg_pct': oi_chg_pct,
                         'prev_oi': int(prev_oi),
                         'latest_oi': int(latest_oi),
                         'chg_oi': int(chg_oi),
-                        'oi_data_quality': 'exact' if float(prev_oi) > 0 else 'estimated',
+                        'oi_data_quality': data_quality,
                     })
 
                 if items:
