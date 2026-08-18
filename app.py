@@ -162,10 +162,10 @@ is_light = st.session_state.theme == "LIGHT"
 
 # Determine text colors based on theme
 if is_dark:
-    text_primary = "#e8f0f8"      # Very light blue-white
-    text_secondary = "#a0b8d0"   # Light blue-gray
-    text_muted = "#6a8aaa"       # Medium blue-gray
-    text_dark = "#3a5a7a"         # Dark blue-gray
+    text_primary = "#f0f6fc"      # Very light blue-white (brighter for clarity)
+    text_secondary = "#b8d0e8"   # Light blue-gray (brightened)
+    text_muted = "#9fc4e8"       # Medium blue-gray (brightened from #6a8aaa)
+    text_dark = "#7fa8cf"         # Dark blue-gray (brightened from #3a5a7a)
     bg_primary = T['bg_main']     # Main background
     bg_card = T['bg_card']        # Card background
     bg_card_alt = T['bg_card_alt'] # Alt card background
@@ -182,10 +182,10 @@ if is_dark:
     badge_text_light = "#000000"
     badge_text_dark = "#ffffff"
 else:
-    text_primary = "#1a2332"      # Very dark blue
-    text_secondary = "#3a4a5a"    # Dark gray-blue
-    text_muted = "#6a7a8a"       # Medium gray
-    text_dark = "#9aaab8"         # Light gray
+    text_primary = "#0a1420"      # Very dark blue (darker for more contrast)
+    text_secondary = "#1e2e3e"    # Dark gray-blue (darkened)
+    text_muted = "#3a5468"       # Medium gray (darkened from #6a7a8a)
+    text_dark = "#6a8298"         # Light gray (darkened from #9aaab8)
     bg_primary = T['bg_main']
     bg_card = T['bg_card']
     bg_card_alt = T['bg_card_alt']
@@ -232,6 +232,21 @@ section[data-testid="stSidebar"] * {{
 
 /* Hide default menus */
 #MainMenu, footer, header {{ visibility: hidden !important; }}
+
+/* Header hide karne se sidebar ka expand/collapse arrow (>>) bhi chhup
+   jaata hai kyunki wo header toolbar ke andar hota hai — isliye use
+   explicitly wapas visible aur clickable karo */
+[data-testid="collapsedControl"] {{
+    visibility: visible !important;
+    display: block !important;
+    position: fixed !important;
+    top: 10px !important;
+    left: 10px !important;
+    z-index: 999999 !important;
+}}
+[data-testid="collapsedControl"] svg {{
+    fill: #00d4ff !important;
+}}
 
 /* ============================================
    HEADER
@@ -831,17 +846,19 @@ st.markdown("""
     font-size: 11px !important;
 }
 .stCaption > div {
-    color: #6a8aaa !important;
+    color: #9fc4e8 !important;
 }
 
 /* Text input placeholder */
 .stTextInput > div > div > input::placeholder {
-    color: #3a5a7a !important;
+    color: #7fa8cf !important;
+    opacity: 1 !important;
 }
 
 /* Number input placeholder */
 .stNumberInput > div > div > input::placeholder {
-    color: #3a5a7a !important;
+    color: #7fa8cf !important;
+    opacity: 1 !important;
 }
 
 /* Selectbox placeholder */
@@ -1449,6 +1466,16 @@ with st.sidebar:
     st.session_state.min_oi_change = min_oi_change
     st.markdown(f"<div style='font-size:10px;color:#00d4ff;text-align:center;'>≥ {min_oi_change}% for STRONG signal</div>", unsafe_allow_html=True)
 
+    # Min Absolute OI Slider (liquidity filter)
+    st.markdown("<div style='font-size:11px;color:#6a8aaa;margin:8px 0 4px;'>💧 Min Absolute OI (Liquidity)</div>", unsafe_allow_html=True)
+    min_absolute_oi = st.slider("", 100, 5000, 500, 100,
+                              help="Isse kam absolute OI (contracts) wale stocks 'LOW LIQUIDITY ⚠️' tag "
+                                   "ke saath dikhenge — chahe unka OI% badha hua kyun na dikhe, kyunki "
+                                   "chhoti base OI par bada % noise ho sakta hai.",
+                              label_visibility="collapsed")
+    st.session_state.min_absolute_oi = min_absolute_oi
+    st.markdown(f"<div style='font-size:10px;color:#00d4ff;text-align:center;'>≥ {min_absolute_oi:,} contracts</div>", unsafe_allow_html=True)
+
     st.markdown("---")
     st.markdown("<div class='section-h'>Accuracy Mode</div>", unsafe_allow_html=True)
     accuracy_mode = st.select_slider("", 
@@ -1879,12 +1906,18 @@ def get_oi_spurts_nsepython():
                         latest_oi = item.get('latestOI', 
                                     item.get('openInterest', 0)) or 0
 
-                        chg_oi = item.get('changeinOpenInterest',
-                                 item.get('changeInOpenInterest', 0)) or 0
+                        # NSE ka raw changeinOpenInterest field market-closed
+                        # hours mein 0 aata hai (sirf live session mein
+                        # populate hota hai) — isliye khud calculate karo,
+                        # taaki after-hours bhi sahi dikhe
+                        chg_oi = float(latest_oi) - float(prev_oi)
 
                         # Calculate OI change % if not provided
+                        oi_data_quality = 'exact'
                         if float(pchg) == 0 and float(prev_oi) > 0 and float(latest_oi) > 0:
                             pchg = round(((float(latest_oi) - float(prev_oi)) / float(prev_oi)) * 100, 2)
+                        elif float(prev_oi) <= 0:
+                            oi_data_quality = 'estimated'
 
                         items.append({
                             'symbol': sym,
@@ -1892,6 +1925,7 @@ def get_oi_spurts_nsepython():
                             'prev_oi': int(prev_oi),
                             'latest_oi': int(latest_oi),
                             'chg_oi': int(chg_oi),
+                            'oi_data_quality': oi_data_quality,
                         })
 
                     if items:
@@ -1907,33 +1941,22 @@ def get_oi_spurts_nsepython():
     return None, "all endpoints failed"
 
 def get_oi_spurts_direct():
-    """Fallback: Direct NSE requests with session management"""
+    """Fallback: Direct NSE requests — lightweight single-hit session
+    (F&O Pro Scanner jaisa hi proven approach — 3 pages visit karne ki
+    jagah sirf homepage ek baar hit karke seedha API call karta hai,
+    isse tez bhi hai aur NSE ke bot-detection ko kam suspicious lagta hai)"""
     try:
         session = requests.Session()
         headers = {
-            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36',
-            'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
-            'Accept-Language': 'en-US,en;q=0.9',
-            'Accept-Encoding': 'gzip, deflate, br',
-            'Connection': 'keep-alive',
-            'Upgrade-Insecure-Requests': '1',
+            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/124.0.0.0 Safari/537.36",
+            "Accept": "*/*", "Accept-Language": "en-US,en;q=0.9",
+            "Referer": "https://www.nseindia.com/", "Connection": "keep-alive",
         }
-
-        session.get('https://www.nseindia.com', headers=headers, timeout=15)
-        time.sleep(1)
-        session.get('https://www.nseindia.com/market-data', headers=headers, timeout=15)
-        time.sleep(1)
-        session.get('https://www.nseindia.com/market-data/oi-spurts', headers=headers, timeout=15)
-        time.sleep(1)
-
-        api_headers = {
-            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
-            'Accept': 'application/json, text/plain, */*',
-            'Accept-Language': 'en-US,en;q=0.9',
-            'Referer': 'https://www.nseindia.com/market-data/oi-spurts',
-            'X-Requested-With': 'XMLHttpRequest',
-            'Connection': 'keep-alive',
-        }
+        session.headers.update(headers)
+        try:
+            session.get("https://www.nseindia.com", timeout=10)
+        except:
+            pass
 
         endpoints = [
             "https://www.nseindia.com/api/live-analysis-oi-spurts-underlyings",
@@ -1941,7 +1964,7 @@ def get_oi_spurts_direct():
         ]
 
         for endpoint in endpoints:
-            response = session.get(endpoint, headers=api_headers, timeout=15)
+            response = session.get(endpoint, timeout=15)
             if response.status_code == 200:
                 data = response.json()
                 items = []
@@ -1954,7 +1977,9 @@ def get_oi_spurts_direct():
                     pchg = item.get('pchangeinOpenInterest', item.get('pChange', 0)) or 0
                     prev_oi = item.get('prevOI', 0) or 0
                     latest_oi = item.get('latestOI', 0) or 0
-                    chg_oi = item.get('changeinOpenInterest', 0) or 0
+                    # NSE ka raw changeinOpenInterest field market-closed
+                    # hours mein 0 aata hai — isliye khud calculate karo
+                    chg_oi = float(latest_oi) - float(prev_oi)
 
                     items.append({
                         'symbol': sym,
@@ -1962,6 +1987,7 @@ def get_oi_spurts_direct():
                         'prev_oi': int(prev_oi),
                         'latest_oi': int(latest_oi),
                         'chg_oi': int(chg_oi),
+                        'oi_data_quality': 'exact' if float(prev_oi) > 0 else 'estimated',
                     })
 
                 if items:
@@ -2754,18 +2780,30 @@ with tab1:
             else:
                 st.success(f"✅ OI Spurts loaded via {oi_source}! Top: {oi_list[0]['symbol']} (+{oi_list[0]['oi_chg_pct']:.2f}%)")
 
+                _min_abs_oi = st.session_state.get('min_absolute_oi', 500)
+                low_liq_count = sum(1 for x in oi_list[:20]
+                                     if x.get('latest_oi', 0) < _min_abs_oi or x.get('prev_oi', 0) < _min_abs_oi)
+                if low_liq_count:
+                    st.warning(f"⚠️ {low_liq_count}/{len(oi_list[:20])} stocks LOW LIQUIDITY hain "
+                               f"(absolute OI < {_min_abs_oi:,} contracts) — inka OI% bada dikh sakta hai, "
+                               f"par size chhota liya jaye.")
+
                 # Show OI preview
                 oi_preview = pd.DataFrame([{
                     'RANK': i+1,
                     'SYMBOL': x['symbol'],
-                    'OI CHANGE %': f"{'🟢' if x['oi_chg_pct'] >= 0 else '🔴'} {x['oi_chg_pct']:+.2f}%",
+                    'OI CHANGE %': (f"{'🟢' if x['oi_chg_pct'] >= 0 else '🔴'} {x['oi_chg_pct']:+.2f}%")
+                                   + (" ~est" if x.get('oi_data_quality') == 'estimated' else ""),
                     'PREV OI': f"{x['prev_oi']:,}",
                     'LATEST OI': f"{x['latest_oi']:,}",
                     'CHG OI': f"{x['chg_oi']:+,}",
+                    'LIQUIDITY': "⚠️ LOW" if (x.get('latest_oi', 0) < _min_abs_oi or x.get('prev_oi', 0) < _min_abs_oi) else "✅ OK",
                 } for i, x in enumerate(oi_list[:20])])
 
-                with st.expander("📊 NSE OI Spurts Raw Data", expanded=False):
+                with st.expander("📊 NSE OI Spurts Raw Data", expanded=True):
                     st.dataframe(oi_preview, use_container_width=True, hide_index=True)
+                    st.caption("**~est** = prev-day OI 0/missing tha, isliye NSE ka pchg fallback use hua "
+                               "(real calculated % nahi). **⚠️ LOW** = absolute OI threshold se kam, illiquid contract.")
 
                 # Determine stock list based on mode
                 if "QUICK" in scan_mode:
