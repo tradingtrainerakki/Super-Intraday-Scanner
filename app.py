@@ -1408,20 +1408,6 @@ with st.sidebar:
     orb_minutes = st.slider("Opening Range (min)", 5, 30, 15, 
                             help="First kitne minutes ka range lo ORB ke liye")
 
-    # ── BREAKOUT VALIDITY CUTOFF (kitni der range close hone ke baad tak breakout valid) ──
-    breakout_valid_cutoff = st.slider("Breakout Valid Till (min after ORB range closes)", 5, 60, 15, 5,
-                            help="ORB range (jitne minute upar select kiya) band hone ke baad, breakout ko itne "
-                                 "minute ke andar aana chahiye tabhi wo VALID mana jayega. Isse zyada der ho jaye "
-                                 "to wo stock 'ORB Expired' keh kar skip ho jayega — chahe aap kisi bhi time scan karo, "
-                                 "result hamesha fixed rahega.\n\n"
-                                 "Example: Opening Range=5min, Cutoff=15min -> Range 9:15-9:20 banega, "
-                                 "breakout sirf 9:20-9:35 ke beech aana chahiye, warna expired.")
-    st.session_state.breakout_valid_cutoff = breakout_valid_cutoff
-
-    _range_close_preview = now_ist().replace(hour=9, minute=15, second=0, microsecond=0) + timedelta(minutes=orb_minutes)
-    _valid_till_preview = _range_close_preview + timedelta(minutes=breakout_valid_cutoff)
-    st.markdown(f"<div style='font-size:10px;color:#00d4ff;text-align:center;'>Range closes {_range_close_preview.strftime('%H:%M')} → Breakout valid till {_valid_till_preview.strftime('%H:%M')} AM</div>", unsafe_allow_html=True)
-
     st.markdown("<div class='section-h'>Filters</div>", unsafe_allow_html=True)
     gap_spike_filter = st.checkbox("⚡ Gap + Spike Filter", value=True,
                                    help="2% gap + 1.5% first 5-min move → SKIP")
@@ -1448,16 +1434,6 @@ with st.sidebar:
                               label_visibility="collapsed")
     st.session_state.min_oi_change = min_oi_change
     st.markdown(f"<div style='font-size:10px;color:#00d4ff;text-align:center;'>≥ {min_oi_change}% for STRONG signal</div>", unsafe_allow_html=True)
-
-    # Min Absolute OI Slider (liquidity filter)
-    st.markdown("<div style='font-size:11px;color:#6a8aaa;margin:8px 0 4px;'>💧 Min Absolute OI (Liquidity)</div>", unsafe_allow_html=True)
-    min_absolute_oi = st.slider("", 100, 5000, 500, 100,
-                              help="Isse kam absolute OI (contracts) wale stocks 'LOW LIQUIDITY ⚠️' tag "
-                                   "ke saath dikhenge — chahe unka OI% badha hua kyun na dikhe, kyunki "
-                                   "chhoti base OI par bada % noise ho sakta hai.",
-                              label_visibility="collapsed")
-    st.session_state.min_absolute_oi = min_absolute_oi
-    st.markdown(f"<div style='font-size:10px;color:#00d4ff;text-align:center;'>≥ {min_absolute_oi:,} contracts</div>", unsafe_allow_html=True)
 
     st.markdown("---")
     st.markdown("<div class='section-h'>Accuracy Mode</div>", unsafe_allow_html=True)
@@ -1889,18 +1865,12 @@ def get_oi_spurts_nsepython():
                         latest_oi = item.get('latestOI', 
                                     item.get('openInterest', 0)) or 0
 
-                        # NSE ka raw changeinOpenInterest field market-closed
-                        # hours mein 0 aata hai (sirf live session mein
-                        # populate hota hai) — isliye khud calculate karo,
-                        # taaki after-hours bhi sahi dikhe
-                        chg_oi = float(latest_oi) - float(prev_oi)
+                        chg_oi = item.get('changeinOpenInterest',
+                                 item.get('changeInOpenInterest', 0)) or 0
 
                         # Calculate OI change % if not provided
-                        oi_data_quality = 'exact'
                         if float(pchg) == 0 and float(prev_oi) > 0 and float(latest_oi) > 0:
                             pchg = round(((float(latest_oi) - float(prev_oi)) / float(prev_oi)) * 100, 2)
-                        elif float(prev_oi) <= 0:
-                            oi_data_quality = 'estimated'
 
                         items.append({
                             'symbol': sym,
@@ -1908,7 +1878,6 @@ def get_oi_spurts_nsepython():
                             'prev_oi': int(prev_oi),
                             'latest_oi': int(latest_oi),
                             'chg_oi': int(chg_oi),
-                            'oi_data_quality': oi_data_quality,
                         })
 
                     if items:
@@ -1971,9 +1940,7 @@ def get_oi_spurts_direct():
                     pchg = item.get('pchangeinOpenInterest', item.get('pChange', 0)) or 0
                     prev_oi = item.get('prevOI', 0) or 0
                     latest_oi = item.get('latestOI', 0) or 0
-                    # NSE ka raw changeinOpenInterest field market-closed
-                    # hours mein 0 aata hai — isliye khud calculate karo
-                    chg_oi = float(latest_oi) - float(prev_oi)
+                    chg_oi = item.get('changeinOpenInterest', 0) or 0
 
                     items.append({
                         'symbol': sym,
@@ -1981,7 +1948,6 @@ def get_oi_spurts_direct():
                         'prev_oi': int(prev_oi),
                         'latest_oi': int(latest_oi),
                         'chg_oi': int(chg_oi),
-                        'oi_data_quality': 'exact' if float(prev_oi) > 0 else 'estimated',
                     })
 
                 if items:
@@ -2080,112 +2046,6 @@ def analyze_stock_orb_oi(ticker, oi_info, orb_mins=15, gap_filter=True,
         if len(prev_data) == 0 or len(today_data) == 0:
             return None, "Data error"
 
-        # ── FIXED ORB RANGE-CLOSE TIME + BREAKOUT VALIDITY CUTOFF ──
-        # ORB range hamesha 9:15 AM se orb_mins tak fixed hota hai (jaise
-        # 5/15/30 min slider se select kiya). Range band hone ke baad,
-        # breakout ko sirf 'breakout_valid_cutoff' minutes ke andar aana
-        # chahiye — chahe aap kisi bhi time scan karo (9:20 ho ya 1 baje),
-        # hamesha yehi fixed window (range_close se cutoff tak) ka result
-        # aayega. Cutoff nikalne ke baad breakout "expired" maana jayega.
-        market_open_dt = today_data.index[0].replace(hour=9, minute=15, second=0, microsecond=0)
-        range_close_dt = market_open_dt + timedelta(minutes=orb_mins)
-        breakout_cutoff_min = st.session_state.get("breakout_valid_cutoff", 15)
-        valid_till_dt = range_close_dt + timedelta(minutes=breakout_cutoff_min)
-
-        # FIX: opening_range strictly range_close_dt SE PEHLE tak honi chahiye
-        # (< , <= nahi) — warna jab orb_mins candle-interval ka multiple ho
-        # (5, 15, 30...), to "agli" candle (jo breakout confirm karti hai)
-        # galti se range me hi mix ho jaati thi, aur breakout detect karna
-        # lagbhag impossible ho jaata tha (kyunki wahi candle range bana rahi
-        # hoti thi). Ab range aur breakout candle strictly alag hain.
-        opening_range = today_data[today_data.index < range_close_dt]
-        if opening_range.empty:
-            return None, "ORB range still forming"
-
-        # Breakout sirf range close hone ke turant baad (>=) se cutoff tak
-        breakout_window_data = today_data[(today_data.index >= range_close_dt) & (today_data.index <= valid_till_dt)]
-
-        if breakout_window_data.empty:
-            if today_data.index[-1] <= range_close_dt:
-                return None, "ORB range still forming"
-            return None, f"Breakout window expired ({breakout_cutoff_min} min cutoff crossed)"
-
-        orb_high = opening_range['High'].max()
-        orb_low = opening_range['Low'].min()
-
-        # current_candle hamesha cutoff window ki AAKHRI candle hai
-        # (chahe aap kisi bhi time scan karo, ye candle fixed rahegi
-        # jab tak orb_mins/breakout_valid_cutoff change na ho)
-        # ── BOTH SIDE ORB: Check EVERY candle in breakout window ──
-        # Step 1: Current price kahan hai? (Active breakout)
-        current_candle = breakout_window_data.iloc[-1]
-        current_price = float(current_candle['Close'])
-
-        base_signal = None
-        entry_price = None
-        stop_loss = None
-        orb_break_time = None
-        orb_retraced = False
-
-        # Agar current price range ke bahar hai → immediate signal
-        if current_price > orb_high:
-            base_signal = "BUY"
-            entry_price = orb_high
-            stop_loss = orb_low
-        elif current_price < orb_low:
-            base_signal = "SELL"
-            entry_price = orb_low
-            stop_loss = orb_high
-        else:
-            # Step 2: Current price range ke andar hai → historical breakout check karo
-            # Sabse RECENT breakout kaun sa tha?
-            breakout_time = None
-            breakdown_time = None
-            last_breakout_price = None
-            last_breakdown_price = None
-
-            for idx, row in breakout_window_data.iterrows():
-                c = float(row['Close'])
-                if c > orb_high:
-                    breakout_time = idx      # Har baar update karo = last wala milega
-                    last_breakout_price = c
-                if c < orb_low:
-                    breakdown_time = idx     # Har baar update karo = last wala milega
-                    last_breakdown_price = c
-
-            # Most recent breakout decide karo
-            if breakout_time is not None and breakdown_time is not None:
-                if breakout_time > breakdown_time:
-                    base_signal = "BUY"
-                    entry_price = orb_high
-                    stop_loss = orb_low
-                    orb_break_time = breakout_time
-                    orb_retraced = True
-                else:
-                    base_signal = "SELL"
-                    entry_price = orb_low
-                    stop_loss = orb_high
-                    orb_break_time = breakdown_time
-                    orb_retraced = True
-            elif breakout_time is not None:
-                base_signal = "BUY"
-                entry_price = orb_high
-                stop_loss = orb_low
-                orb_break_time = breakout_time
-                orb_retraced = True
-            elif breakdown_time is not None:
-                base_signal = "SELL"
-                entry_price = orb_low
-                stop_loss = orb_high
-                orb_break_time = breakdown_time
-                orb_retraced = True
-            else:
-                return None, "No ORB breakout"
-
-        # Baaki calculations (VWAP/Volume/ATR) bhi isi cutoff tak cap karo
-        # taaki wo bhi scan-time-independent rahein
-        today_data = today_data[today_data.index <= valid_till_dt]
-
         prev_close = float(prev_data['Close'].iloc[-1])
         today_open = float(today_data['Open'].iloc[0])
 
@@ -2199,6 +2059,28 @@ def analyze_stock_orb_oi(ticker, oi_info, orb_mins=15, gap_filter=True,
         if gap_filter and first_candle_move >= 2.0:
             return None, f"Spike filter: {first_candle_move:.1f}%"
 
+        # ── ORB CALCULATION ──
+        candles_needed = max(1, orb_mins // 5)
+        opening_range = today_data.head(candles_needed)
+        if opening_range.empty:
+            return None, "ORB empty"
+
+        orb_high = opening_range['High'].max()
+        orb_low = opening_range['Low'].min()
+        current_candle = today_data.iloc[-1]
+        current_price = float(current_candle['Close'])
+
+        if current_price > orb_high:
+            base_signal = "BUY"
+            entry_price = orb_high
+            stop_loss = orb_low
+        elif current_price < orb_low:
+            base_signal = "SELL"
+            entry_price = orb_low
+            stop_loss = orb_high
+        else:
+            return None, "No ORB breakout"
+
         # ── FILTER 2: VWAP ──
         vwap = calculate_vwap(today_data)
         vwap_pass = False
@@ -2206,14 +2088,7 @@ def analyze_stock_orb_oi(ticker, oi_info, orb_mins=15, gap_filter=True,
             vwap_pass = (base_signal == "BUY" and current_price > vwap) or                        (base_signal == "SELL" and current_price < vwap)
 
         # ── FILTER 3: EMA ──
-        # NOTE: EMA ab poore live df par nahi, balki valid_till_dt tak
-        # capped df par nikalta hai — taaki scan chahe 9:20 AM ho ya 1 PM,
-        # EMA hamesha wahi fixed value de (jaise baaki sab kuch already
-        # valid_till_dt tak capped hai). Multi-day history isliye rakhi
-        # gayi hai kyunki sirf aaj ke 6-10 candles se EMA20 theek se
-        # smooth nahi hota.
-        df_for_ema = df[df.index <= valid_till_dt]
-        ema20 = float(ema(df_for_ema['Close'], 20).iloc[-1])
+        ema20 = float(ema(df['Close'], 20).iloc[-1])
         ema_pass = False
         if ema_filter:
             ema_pass = (base_signal == "BUY" and current_price > ema20) or                       (base_signal == "SELL" and current_price < ema20)
@@ -2236,8 +2111,7 @@ def analyze_stock_orb_oi(ticker, oi_info, orb_mins=15, gap_filter=True,
         # ── ACCURACY CALCULATION ──
         filters_passed = 1  # ORB always passed
         total_filters = 1
-        retrace_note = " [RETRACED]" if orb_retraced else ""
-        filter_details = [("ORB Breakout", True, f"Price broke {base_signal} @ {orb_break_time.strftime('%H:%M') if orb_break_time else 'N/A'}{retrace_note}")]
+        filter_details = [("ORB Breakout", True, f"Price broke {base_signal}")]
 
         if vwap_filter:
             total_filters += 1
@@ -2275,12 +2149,6 @@ def analyze_stock_orb_oi(ticker, oi_info, orb_mins=15, gap_filter=True,
         target = entry_price + (risk * risk_reward) if base_signal == "BUY" else entry_price - (risk * risk_reward)
 
         # ── OI BUILDUP CLASSIFICATION ──
-        # NOTE: price_up ab AAJ ke open ke against nikalta hai (intraday/ORB
-        # context), prev_close ke against nahi — kyunki ORB signal khud
-        # intraday breakout par based hai, poore din ke prev-close-vs-now
-        # trend par nahi. Isse SELL side ORB signals bhi fairly align ho
-        # paate hain jab stock kal ke close se abhi bhi green ho lekin aaj
-        # ke open se neeche trade kar raha ho.
         oi_pct = oi_info.get('oi_chg_pct', 0)
 
         # ── STRICT FILTER: Skip if Volume or OI below threshold ──
@@ -2295,7 +2163,7 @@ def analyze_stock_orb_oi(ticker, oi_info, orb_mins=15, gap_filter=True,
                 return None, f"OI filter: {abs(oi_pct)}% < {min_oi}%"
 
         oi_up = oi_pct > 0
-        price_up = current_price > today_open
+        price_up = ((current_price - prev_close) / prev_close * 100) > 0
 
         if oi_up and price_up:
             oi_buildup = "🐂 LONG BUILDUP"
@@ -2373,8 +2241,6 @@ def analyze_stock_orb_oi(ticker, oi_info, orb_mins=15, gap_filter=True,
             "OI SIGNAL": oi_signal,
             "OI ALIGN": "✅ ALIGNED" if oi_alignment > 0 else "⚠️ CONFLICT" if oi_alignment < 0 else "➖ NEUTRAL",
             "SECTOR": STOCK_TO_SECTOR.get(ticker, "—"),
-            "ORB_RETRACED": orb_retraced,
-            "ORB_BREAK_TIME": str(orb_break_time.strftime("%H:%M")) if orb_break_time else "N/A",
             "DATA_SOURCE": source.upper(),
             "filter_details": filter_details,
             "vwap_val": round(vwap, 2) if vwap else None,
@@ -2774,30 +2640,18 @@ with tab1:
             else:
                 st.success(f"✅ OI Spurts loaded via {oi_source}! Top: {oi_list[0]['symbol']} (+{oi_list[0]['oi_chg_pct']:.2f}%)")
 
-                _min_abs_oi = st.session_state.get('min_absolute_oi', 500)
-                low_liq_count = sum(1 for x in oi_list[:20]
-                                     if x.get('latest_oi', 0) < _min_abs_oi or x.get('prev_oi', 0) < _min_abs_oi)
-                if low_liq_count:
-                    st.warning(f"⚠️ {low_liq_count}/{len(oi_list[:20])} stocks LOW LIQUIDITY hain "
-                               f"(absolute OI < {_min_abs_oi:,} contracts) — inka OI% bada dikh sakta hai, "
-                               f"par size chhota liya jaye.")
-
                 # Show OI preview
                 oi_preview = pd.DataFrame([{
                     'RANK': i+1,
                     'SYMBOL': x['symbol'],
-                    'OI CHANGE %': (f"{'🟢' if x['oi_chg_pct'] >= 0 else '🔴'} {x['oi_chg_pct']:+.2f}%")
-                                   + (" ~est" if x.get('oi_data_quality') == 'estimated' else ""),
+                    'OI CHANGE %': f"{'🟢' if x['oi_chg_pct'] >= 0 else '🔴'} {x['oi_chg_pct']:+.2f}%",
                     'PREV OI': f"{x['prev_oi']:,}",
                     'LATEST OI': f"{x['latest_oi']:,}",
                     'CHG OI': f"{x['chg_oi']:+,}",
-                    'LIQUIDITY': "⚠️ LOW" if (x.get('latest_oi', 0) < _min_abs_oi or x.get('prev_oi', 0) < _min_abs_oi) else "✅ OK",
                 } for i, x in enumerate(oi_list[:20])])
 
                 with st.expander("📊 NSE OI Spurts Raw Data", expanded=False):
                     st.dataframe(oi_preview, use_container_width=True, hide_index=True)
-                    st.caption("**~est** = prev-day OI 0/missing tha, isliye NSE ka pchg fallback use hua "
-                               "(real calculated % nahi). **⚠️ LOW** = absolute OI threshold se kam, illiquid contract.")
 
                 # Determine stock list based on mode
                 if "QUICK" in scan_mode:
