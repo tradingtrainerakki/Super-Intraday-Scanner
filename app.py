@@ -2000,14 +2000,18 @@ def get_oi_spurts_direct():
     return None, "direct failed"
 
 def get_oi_spurts():
-    """Unified OI Spurts fetcher - tries nsepython first, then direct"""
-    # Method 1: nsepython
-    result, source = get_oi_spurts_nsepython()
+    """Unified OI Spurts fetcher — lean 'direct' approach (F&O Pro
+    Scanner jaisa, proven, single-hit) pehle try hota hai; nsepython
+    sirf backup ke liye hai. Pehle nsepython pehle try karne se har
+    click par NSE ko double requests jaate the (nsepython + direct dono),
+    jisse rate-limit/block jaldi lagta tha — isliye order palat diya."""
+    # Method 1: Direct requests (lean, proven — F&O scanner jaisa)
+    result, source = get_oi_spurts_direct()
     if result:
         return result, source
 
-    # Method 2: Direct requests
-    result, source = get_oi_spurts_direct()
+    # Method 2: nsepython (backup only, agar direct fail ho)
+    result, source = get_oi_spurts_nsepython()
     if result:
         return result, source
 
