@@ -2772,7 +2772,10 @@ with tab1:
     # SCAN BUTTON
     if refresh or 'scan_results' not in st.session_state:
         if refresh:
-            # Get OI Spurts
+            # Get OI Spurts — sirf ek attempt (auto-retry jaanbujh kar
+            # nahi rakha, taaki rapid repeated requests se NSE poori
+            # tarah block na kar de). Fail ho to user khud dobara
+            # "SCAN NOW" dabaye, thoda gap dekar.
             with st.spinner("🔍 Fetching NSE OI Spurts data..."):
                 oi_list, oi_source = get_oi_spurts()
                 st.session_state['oi_list'] = oi_list
