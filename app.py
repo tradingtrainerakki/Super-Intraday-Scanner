@@ -206,9 +206,6 @@ st.markdown(f"""
 <style>
 @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Syne:wght@700;800&display=swap');
 
-/* ============================================
-   ROOT & BASE STYLES - HIGHEST SPECIFICITY
-   ============================================ */
 html, body, .stApp, [data-testid="stAppViewContainer"], 
 [data-testid="stVerticalBlock"], [data-testid="stHorizontalBlock"] {{
     background-color: {bg_primary} !important;
@@ -216,12 +213,10 @@ html, body, .stApp, [data-testid="stAppViewContainer"],
     font-family: 'JetBrains Mono', monospace !important;
 }}
 
-/* Force all text elements */
 .stApp * {{
     color: {text_primary};
 }}
 
-/* Streamlit sidebar */
 section[data-testid="stSidebar"] {{ 
     background-color: {bg_card} !important; 
     border-right: 1px solid {border_color} !important;
@@ -230,12 +225,8 @@ section[data-testid="stSidebar"] * {{
     color: {text_primary} !important;
 }}
 
-/* Hide default menus */
 #MainMenu, footer, header {{ visibility: hidden !important; }}
 
-/* Header hide karne se sidebar ka expand/collapse arrow (>>) bhi chhup
-   jaata hai kyunki wo header toolbar ke andar hota hai — isliye use
-   explicitly wapas visible aur clickable karo */
 [data-testid="collapsedControl"] {{
     visibility: visible !important;
     display: block !important;
@@ -248,9 +239,6 @@ section[data-testid="stSidebar"] * {{
     fill: #00d4ff !important;
 }}
 
-/* ============================================
-   HEADER
-   ============================================ */
 .super-header {{
     background: linear-gradient(135deg, {bg_card}, {bg_primary});
     border-bottom: 1px solid {border_color};
@@ -270,9 +258,6 @@ section[data-testid="stSidebar"] * {{
     letter-spacing: 3px; text-transform: uppercase;
 }}
 
-/* ============================================
-   METRIC CARDS
-   ============================================ */
 .metric-card-super {{
     background: linear-gradient(135deg, {bg_card}, {bg_card_alt}) !important;
     border: 1px solid {border_color} !important;
@@ -286,9 +271,6 @@ section[data-testid="stSidebar"] * {{
     transform: translateY(-2px);
 }}
 
-/* ============================================
-   SIGNAL CARDS
-   ============================================ */
 .card-strong-buy {{
     background: linear-gradient(135deg, {accent_green}18, {accent_green}08) !important;
     border: 1px solid {accent_green}60 !important;
@@ -318,9 +300,6 @@ section[data-testid="stSidebar"] * {{
     margin: 8px 0 !important;
 }}
 
-/* ============================================
-   OI BADGES
-   ============================================ */
 .badge-long-build {{
     background: linear-gradient(90deg, {accent_green}, {accent_green}) !important;
     color: {badge_text_light} !important; 
@@ -362,9 +341,6 @@ section[data-testid="stSidebar"] * {{
     display: inline-block;
 }}
 
-/* ============================================
-   ACCURACY BADGES
-   ============================================ */
 .acc-badge {{
     display: inline-block; 
     padding: 6px 16px;
@@ -386,9 +362,6 @@ section[data-testid="stSidebar"] * {{
     color: #ffffff !important; 
 }}
 
-/* ============================================
-   BUTTONS
-   ============================================ */
 .stButton > button {{
     background: linear-gradient(90deg, {accent_cyan}25, {accent_green}25) !important;
     color: {accent_cyan} !important; 
@@ -407,9 +380,6 @@ section[data-testid="stSidebar"] * {{
     border-color: transparent !important;
 }}
 
-/* ============================================
-   TABS
-   ============================================ */
 .stTabs [data-baseweb="tab-list"] {{
     background: {bg_card} !important;
     border-bottom: 1px solid {border_color} !important;
@@ -433,9 +403,6 @@ section[data-testid="stSidebar"] * {{
     border-bottom: 2px solid {accent_cyan} !important;
 }}
 
-/* ============================================
-   INPUTS
-   ============================================ */
 .stTextInput > div > div > input, 
 .stNumberInput > div > div > input,
 .stSelectbox > div > div, 
@@ -448,9 +415,6 @@ section[data-testid="stSidebar"] * {{
     font-size: 12px !important;
 }}
 
-/* ============================================
-   SECTION HEADERS
-   ============================================ */
 .section-h {{
     font-family: 'Syne', sans-serif !important; 
     font-size: 1rem;
@@ -463,9 +427,6 @@ section[data-testid="stSidebar"] * {{
     margin: 16px 0 12px;
 }}
 
-/* ============================================
-   FILTER BOXES - CRITICAL FIX
-   ============================================ */
 .filter-box-super {{
     background: {bg_card} !important; 
     border: 1px solid {border_color} !important;
@@ -494,9 +455,6 @@ section[data-testid="stSidebar"] * {{
     background: linear-gradient(90deg, {accent_red}15, {bg_card}) !important;
 }}
 
-/* ============================================
-   OI CARDS - CRITICAL FIX
-   ============================================ */
 .oi-card-super {{
     background: linear-gradient(135deg, {bg_card_alt}, {bg_card}) !important;
     border: 1px solid {border_color} !important; 
@@ -517,9 +475,6 @@ section[data-testid="stSidebar"] * {{
     letter-spacing: 1px;
 }}
 
-/* ============================================
-   LOGIN BOX
-   ============================================ */
 .login-box {{
     max-width: 420px; 
     margin: 100px auto;
@@ -531,9 +486,6 @@ section[data-testid="stSidebar"] * {{
     box-shadow: 0 20px 60px rgba(0,0,0,{'0.5' if is_dark else '0.15'});
 }}
 
-/* ============================================
-   STATUS BADGES
-   ============================================ */
 .status-open {{
     background: {accent_green}20 !important;
     border: 1px solid {accent_green}50 !important;
@@ -557,9 +509,6 @@ section[data-testid="stSidebar"] * {{
     display: inline-block;
 }}
 
-/* ============================================
-   SECTOR CARDS
-   ============================================ */
 .sector-card {{
     background: linear-gradient(135deg, {bg_card}, {bg_card_alt}) !important;
     border: 1px solid {border_color} !important; 
@@ -597,9 +546,6 @@ section[data-testid="stSidebar"] * {{
     margin-top: 4px;
 }}
 
-/* ============================================
-   SKIP BOX
-   ============================================ */
 .skip-box {{
     background: {accent_yellow}15 !important;
     border: 1px solid {accent_yellow}40 !important;
@@ -610,10 +556,6 @@ section[data-testid="stSidebar"] * {{
     font-weight: 600;
 }}
 
-/* ============================================
-   STREAMLIT SPECIFIC FIXES
-   ============================================ */
-/* Expander */
 .streamlit-expanderHeader {{
     color: {text_primary} !important;
     font-size: 14px !important;
@@ -624,7 +566,6 @@ section[data-testid="stSidebar"] * {{
     color: {text_primary} !important;
 }}
 
-/* Dataframe */
 [data-testid="stDataFrame"] {{
     border: 1px solid {border_color} !important;
     border-radius: 10px !important;
@@ -643,7 +584,6 @@ section[data-testid="stSidebar"] * {{
     text-transform: uppercase !important;
 }}
 
-/* Metrics */
 [data-testid="stMetricValue"] {{
     color: {text_primary} !important;
     font-weight: 700 !important;
@@ -656,7 +596,6 @@ section[data-testid="stSidebar"] * {{
     color: {accent_green} !important;
 }}
 
-/* Radio buttons */
 .stRadio > div {{
     color: {text_primary} !important;
 }}
@@ -664,43 +603,34 @@ section[data-testid="stSidebar"] * {{
     color: {text_primary} !important;
 }}
 
-/* Checkbox */
 .stCheckbox > label {{
     color: {text_primary} !important;
     font-size: 12px !important;
 }}
 
-/* Slider */
 .stSlider > div > div {{
     color: {text_primary} !important;
 }}
 
-/* Select slider */
 .stSelectSlider > div {{
     color: {text_primary} !important;
 }}
 
-/* Number input labels */
 .stNumberInput > label {{
     color: {text_muted} !important;
     font-size: 11px !important;
 }}
 
-/* Text input labels */
 .stTextInput > label {{
     color: {text_muted} !important;
     font-size: 11px !important;
 }}
 
-/* Selectbox labels */
 .stSelectbox > label {{
     color: {text_muted} !important;
     font-size: 11px !important;
 }}
 
-/* ============================================
-   SCROLLBAR
-   ============================================ */
 ::-webkit-scrollbar {{
     width: 8px;
     height: 8px;
@@ -722,12 +652,8 @@ section[data-testid="stSidebar"] * {{
 
 
 
-# ============================================================
-# HOVER FIX CSS (Separate from theme to avoid f-string brace conflicts)
-# ============================================================
 st.markdown("""
 <style>
-/* Expander hover - prevent white flash */
 .streamlit-expanderHeader:hover {
     background: #1a2436 !important;
     color: #00d4ff !important;
@@ -735,18 +661,12 @@ st.markdown("""
 .streamlit-expanderContent:hover {
     background: #080c12 !important;
 }
-
-/* Dataframe hover */
 [data-testid="stDataFrame"] tr:hover {
     background: #0d1a26 !important;
 }
-
-/* Card hover */
 .metric-card-super:hover {
     border-color: #00d4ff55 !important;
 }
-
-/* Scrollbar */
 ::-webkit-scrollbar {
     width: 8px; height: 8px;
 }
@@ -762,16 +682,8 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
-# ============================================================
-# STREAMLIT COMPONENT COLOR OVERRIDES
-# ============================================================
 st.markdown("""
 <style>
-/* ============================================
-   STREAMLIT DEFAULT COMPONENT OVERRIDES
-   ============================================ */
-
-/* Expander */
 .streamlit-expander {
     background-color: #0d1a26 !important;
     border: 1px solid #1e2d3d !important;
@@ -791,8 +703,6 @@ st.markdown("""
     background-color: #080c12 !important;
     color: #e8f0f8 !important;
 }
-
-/* Success message */
 .stSuccess {
     background-color: #00ff8815 !important;
     border: 1px solid #00ff8840 !important;
@@ -803,8 +713,6 @@ st.markdown("""
 .stSuccess > div {
     color: #00ff88 !important;
 }
-
-/* Info message */
 .stInfo {
     background-color: #00d4ff15 !important;
     border: 1px solid #00d4ff40 !important;
@@ -815,8 +723,6 @@ st.markdown("""
 .stInfo > div {
     color: #00d4ff !important;
 }
-
-/* Warning message */
 .stWarning {
     background-color: #ffc70015 !important;
     border: 1px solid #ffc70040 !important;
@@ -827,8 +733,6 @@ st.markdown("""
 .stWarning > div {
     color: #ffc700 !important;
 }
-
-/* Error message */
 .stError {
     background-color: #ff406015 !important;
     border: 1px solid #ff406040 !important;
@@ -839,8 +743,6 @@ st.markdown("""
 .stError > div {
     color: #ff4060 !important;
 }
-
-/* Caption */
 .stCaption {
     color: #6a8aaa !important;
     font-size: 11px !important;
@@ -848,43 +750,29 @@ st.markdown("""
 .stCaption > div {
     color: #9fc4e8 !important;
 }
-
-/* Text input placeholder */
 .stTextInput > div > div > input::placeholder {
     color: #7fa8cf !important;
     opacity: 1 !important;
 }
-
-/* Number input placeholder */
 .stNumberInput > div > div > input::placeholder {
     color: #7fa8cf !important;
     opacity: 1 !important;
 }
-
-/* Selectbox placeholder */
 .stSelectbox > div > div > div {
     color: #e8f0f8 !important;
 }
-
-/* Slider */
 .stSlider > div > div > div {
     color: #e8f0f8 !important;
 }
-
-/* Checkbox label */
 .stCheckbox > label > span {
     color: #e8f0f8 !important;
 }
-
-/* Radio label */
 .stRadio > div > label > div {
     color: #e8f0f8 !important;
 }
 .stRadio > div > label > div:hover {
     color: #00d4ff !important;
 }
-
-/* Markdown text */
 .stMarkdown {
     color: #e8f0f8 !important;
 }
@@ -894,8 +782,6 @@ st.markdown("""
 .stMarkdown h1, .stMarkdown h2, .stMarkdown h3 {
     color: #00d4ff !important;
 }
-
-/* Metric */
 [data-testid="stMetricValue"] {
     color: #e8f0f8 !important;
     font-weight: 700 !important;
@@ -908,8 +794,6 @@ st.markdown("""
     color: #00ff88 !important;
     font-size: 12px !important;
 }
-
-/* DataFrame */
 [data-testid="stDataFrame"] {
     background: #0d1a26 !important;
     border: 1px solid #1e2d3d !important;
@@ -935,40 +819,28 @@ st.markdown("""
     background: #1a2436 !important;
     color: #e8f0f8 !important;
 }
-
-/* Progress bar */
 .stProgress > div > div > div {
     background: linear-gradient(90deg, #00d4ff, #00ff88) !important;
     border-radius: 4px !important;
 }
-
-/* Spinner */
 .stSpinner > div {
     border-color: #00d4ff !important;
 }
-
-/* Toast/Notification */
 .toast {
     background: #0d1a26 !important;
     border: 1px solid #1e2d3d !important;
     color: #e8f0f8 !important;
 }
-
-/* Tooltip */
 .tooltip {
     background: #0d1a26 !important;
     border: 1px solid #1e2d3d !important;
     color: #e8f0f8 !important;
 }
-
-/* Dialog/Modal */
 .dialog {
     background: #0d1a26 !important;
     border: 1px solid #1e2d3d !important;
     color: #e8f0f8 !important;
 }
-
-/* Button (all states) */
 .stButton > button:active {
     background: linear-gradient(90deg, #00d4ff, #00ff88) !important;
     color: #000 !important;
@@ -976,60 +848,42 @@ st.markdown("""
 .stButton > button:focus {
     box-shadow: 0 0 0 2px #00d4ff50 !important;
 }
-
-/* Select slider */
 .stSelectSlider > div > div {
     color: #e8f0f8 !important;
 }
-
-/* File uploader */
 .stFileUploader > div {
     background: #0d1a26 !important;
     border: 1px solid #1e2d3d !important;
     color: #e8f0f8 !important;
 }
-
-/* Color picker */
 .stColorPicker > div {
     background: #0d1a26 !important;
     border: 1px solid #1e2d3d !important;
 }
-
-/* Date input */
 .stDateInput > div > div > input {
     background: #0d1a26 !important;
     border: 1px solid #1e2d3d !important;
     color: #e8f0f8 !important;
 }
-
-/* Time input */
 .stTimeInput > div > div > input {
     background: #0d1a26 !important;
     border: 1px solid #1e2d3d !important;
     color: #e8f0f8 !important;
 }
-
-/* Text area */
 .stTextArea > div > div > textarea {
     background: #0d1a26 !important;
     border: 1px solid #1e2d3d !important;
     color: #e8f0f8 !important;
 }
-
-/* Code block */
 .stCodeBlock {
     background: #111820 !important;
     border: 1px solid #1e2d3d !important;
     color: #00ff88 !important;
 }
-
-/* Divider */
 hr {
     border-color: #1e2d3d !important;
     border-width: 1px !important;
 }
-
-/* Link */
 a {
     color: #00d4ff !important;
     text-decoration: none !important;
@@ -1038,24 +892,16 @@ a:hover {
     color: #00ff88 !important;
     text-decoration: underline !important;
 }
-
-/* List items */
 li {
     color: #e8f0f8 !important;
 }
-
-/* Bold text */
 strong, b {
     color: #00d4ff !important;
     font-weight: 700 !important;
 }
-
-/* Italic text */
 em, i {
     color: #a0b8d0 !important;
 }
-
-/* Blockquote */
 blockquote {
     border-left: 3px solid #00d4ff !important;
     background: #0d1a26 !important;
@@ -1063,8 +909,6 @@ blockquote {
     padding: 12px 16px !important;
     border-radius: 0 8px 8px 0 !important;
 }
-
-/* Table (non-DataFrame) */
 table {
     border: 1px solid #1e2d3d !important;
     border-radius: 8px !important;
@@ -1079,26 +923,18 @@ td {
     color: #e8f0f8 !important;
     border-bottom: 1px solid #1e2d3d !important;
 }
-
-/* Image caption */
 figcaption {
     color: #6a8aaa !important;
     font-size: 11px !important;
 }
-
-/* Audio/Video player */
 audio, video {
     background: #0d1a26 !important;
     border-radius: 8px !important;
 }
-
-/* Iframe */
 iframe {
     border: 1px solid #1e2d3d !important;
     border-radius: 8px !important;
 }
-
-/* JSON/Code display */
 .json-display {
     background: #111820 !important;
     border: 1px solid #1e2d3d !important;
@@ -1106,8 +942,6 @@ iframe {
     border-radius: 8px !important;
     padding: 12px !important;
 }
-
-/* Status indicators */
 .status-indicator {
     color: #e8f0f8 !important;
 }
@@ -1123,16 +957,12 @@ iframe {
 .status-indicator-info {
     color: #00d4ff !important;
 }
-
-/* Help tooltip icon */
 .stTooltipIcon {
     color: #6a8aaa !important;
 }
 .stTooltipIcon:hover {
     color: #00d4ff !important;
 }
-
-/* Empty state */
 .empty-state {
     color: #6a8aaa !important;
     background: #0d1a26 !important;
@@ -1141,80 +971,52 @@ iframe {
     padding: 40px !important;
     text-align: center !important;
 }
-
-/* Loading state */
 .loading-state {
     color: #00d4ff !important;
 }
-
-/* Skeleton loader */
 .skeleton {
     background: linear-gradient(90deg, #0d1a26, #1a2436, #0d1a26) !important;
     background-size: 200% 100% !important;
 }
-
-/* Animation for smooth transitions */
 * {
     transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease !important;
 }
-
-/* Focus states */
 *:focus {
     outline: none !important;
     box-shadow: 0 0 0 2px #00d4ff40 !important;
 }
-
-/* Selection color */
 ::selection {
     background: #00d4ff33 !important;
     color: #e8f0f8 !important;
 }
-
-/* Scrollbar (universal) */
 * {
     scrollbar-width: thin !important;
     scrollbar-color: #1e2d3d #0d1a26 !important;
 }
-
-/* Print styles (dark mode friendly) */
 @media print {
     body {
         background: #080c12 !important;
         color: #e8f0f8 !important;
     }
 }
-
-/* ============================================
-   ACTIVE/FOCUS/SELECTED STATE FIXES
-   Prevent white flash on click
-   ============================================ */
-
-/* All interactive elements - active state */
 *:active {
     background-color: transparent !important;
     color: inherit !important;
 }
-
-/* Focus visible (keyboard navigation) */
 *:focus-visible {
     outline: 2px solid #00d4ff60 !important;
     outline-offset: 2px !important;
     background-color: transparent !important;
 }
-
-/* Target state (URL hash) */
 *:target {
     background-color: transparent !important;
 }
-
-/* Streamlit expander - all states */
 .streamlit-expander:active,
 .streamlit-expander:focus,
 .streamlit-expander:focus-within {
     background-color: #0d1a26 !important;
     border-color: #00d4ff55 !important;
 }
-
 .streamlit-expanderHeader:active,
 .streamlit-expanderHeader:focus,
 .streamlit-expanderHeader:focus-visible {
@@ -1222,8 +1024,6 @@ iframe {
     color: #00d4ff !important;
     outline: none !important;
 }
-
-/* Streamlit buttons - active state */
 .stButton > button:active,
 .stButton > button:focus,
 .stButton > button:focus-visible {
@@ -1232,8 +1032,6 @@ iframe {
     box-shadow: 0 0 0 3px #00d4ff40 !important;
     outline: none !important;
 }
-
-/* Input fields - focus state */
 .stTextInput > div > div > input:focus,
 .stNumberInput > div > div > input:focus,
 .stTextArea > div > div > textarea:focus,
@@ -1246,8 +1044,6 @@ iframe {
     color: #e8f0f8 !important;
     outline: none !important;
 }
-
-/* Checkbox - checked state */
 .stCheckbox input:checked + div {
     background-color: #00ff88 !important;
     border-color: #00ff88 !important;
@@ -1255,8 +1051,6 @@ iframe {
 .stCheckbox input:checked + div > div {
     background-color: #000 !important;
 }
-
-/* Radio - selected state */
 .stRadio input:checked + div {
     background-color: #00d4ff !important;
     border-color: #00d4ff !important;
@@ -1264,27 +1058,19 @@ iframe {
 .stRadio input:checked + div > div {
     background-color: #000 !important;
 }
-
-/* Selectbox dropdown - open state */
 .stSelectbox > div > div[aria-expanded="true"] {
     background-color: #0d1a26 !important;
     border-color: #00d4ff !important;
 }
-
-/* Slider - thumb active */
 .stSlider > div > div > div > div[role="slider"]:active,
 .stSlider > div > div > div > div[role="slider"]:focus {
     background-color: #00d4ff !important;
     box-shadow: 0 0 0 4px #00d4ff40 !important;
 }
-
-/* DataFrame - selected row */
 [data-testid="stDataFrame"] tr[aria-selected="true"] td {
     background-color: #1a2436 !important;
     color: #00d4ff !important;
 }
-
-/* Tabs - active/selected */
 .stTabs [aria-selected="true"]:active,
 .stTabs [aria-selected="true"]:focus {
     background: linear-gradient(135deg, #00d4ff20, #00ff8820) !important;
@@ -1292,49 +1078,35 @@ iframe {
     color: #00d4ff !important;
     outline: none !important;
 }
-
-/* Any element that gets clicked - prevent white */
 [data-testid]:active,
 [data-testid]:focus {
     background-color: transparent !important;
 }
-
-/* Specific fix for sidebar elements */
 section[data-testid="stSidebar"] *:active,
 section[data-testid="stSidebar"] *:focus {
     background-color: transparent !important;
     color: inherit !important;
 }
-
-/* Expander icon/button */
 .streamlit-expanderHeader > div:last-child:active,
 .streamlit-expanderHeader > div:last-child:focus {
     background-color: transparent !important;
     color: #00d4ff !important;
 }
-
-/* Prevent any white background from Streamlit's default styles */
 [class*="st-"]:active,
 [class*="st-"]:focus,
 [class*="st-"]:focus-within,
 [class*="st-"]:focus-visible {
     background-color: transparent !important;
 }
-
-/* Ensure all pseudo-elements are dark */
 ::before,
 ::after {
     background-color: transparent !important;
     color: inherit !important;
 }
-
-/* Fix for any element that might flash white during transition */
 * {
     -webkit-tap-highlight-color: transparent !important;
     -webkit-focus-ring-color: transparent !important;
 }
-
-/* Specific fix for the expander chevron/arrow icon */
 .streamlit-expanderHeader svg {
     color: #6a8aaa !important;
     fill: #6a8aaa !important;
@@ -1378,7 +1150,6 @@ with st.sidebar:
 
     st.markdown("---")
 
-    # THEME SELECTOR
     st.markdown("<div class='section-h'>🎨 Theme</div>", unsafe_allow_html=True)
     theme_cols = st.columns(3)
     with theme_cols[0]:
@@ -1405,7 +1176,6 @@ with st.sidebar:
         label_visibility="collapsed"
     )
 
-    # Show universe selector immediately when FULL SCAN is selected
     if "FULL" in scan_mode:
         st.markdown("<div class='section-h'>📋 Select Universe</div>", unsafe_allow_html=True)
         universe = st.selectbox("", 
@@ -1425,7 +1195,6 @@ with st.sidebar:
     orb_minutes = st.slider("Opening Range (min)", 5, 30, 15, 
                             help="First kitne minutes ka range lo ORB ke liye")
 
-    # ── BREAKOUT VALIDITY CUTOFF (kitni der range close hone ke baad tak breakout valid) ──
     breakout_valid_cutoff = st.slider("Breakout Valid Till (min after ORB range closes)", 5, 60, 15, 5,
                             help="ORB range (jitne minute upar select kiya) band hone ke baad, breakout ko itne "
                                  "minute ke andar aana chahiye tabhi wo VALID mana jayega. Isse zyada der ho jaye "
@@ -1446,7 +1215,6 @@ with st.sidebar:
     use_ema = st.checkbox("📈 EMA Filter", value=True)
     use_volume = st.checkbox("🔊 Volume Filter", value=True)
 
-    # Volume Ratio Threshold Slider
     st.markdown("<div style='font-size:11px;color:#6a8aaa;margin:8px 0 4px;'>🔊 Min Volume Ratio</div>", unsafe_allow_html=True)
     min_vol_ratio = st.slider("", 1.0, 5.0, 2.0, 0.5,
                               help="Volume vs previous day avg (1.0x = same, 2.0x = double)",
@@ -1458,7 +1226,6 @@ with st.sidebar:
     use_oi = st.checkbox("🎯 OI Buildup Analysis", value=True,
                          help="Long Buildup / Short Buildup / Short Cover / Long Unwind")
 
-    # OI Change % Threshold Slider
     st.markdown("<div style='font-size:11px;color:#6a8aaa;margin:8px 0 4px;'>🎯 Min OI Change %</div>", unsafe_allow_html=True)
     min_oi_change = st.slider("", 0, 50, 10, 5, 
                               help="Minimum OI change % for signal strength",
@@ -1466,7 +1233,6 @@ with st.sidebar:
     st.session_state.min_oi_change = min_oi_change
     st.markdown(f"<div style='font-size:10px;color:#00d4ff;text-align:center;'>≥ {min_oi_change}% for STRONG signal</div>", unsafe_allow_html=True)
 
-    # Min Absolute OI Slider (liquidity filter)
     st.markdown("<div style='font-size:11px;color:#6a8aaa;margin:8px 0 4px;'>💧 Min Absolute OI (Liquidity)</div>", unsafe_allow_html=True)
     min_absolute_oi = st.slider("", 100, 5000, 500, 100,
                               help="Isse kam absolute OI (contracts) wale stocks 'LOW LIQUIDITY ⚠️' tag "
@@ -1493,7 +1259,6 @@ with st.sidebar:
 
     st.markdown("---")
 
-    # DHAN API CONFIG
     if 'dhan_token' not in st.session_state:
         st.session_state.dhan_token = ''
     if 'dhan_renew_token' not in st.session_state:
@@ -1501,7 +1266,6 @@ with st.sidebar:
     if 'dhan_token_expiry' not in st.session_state:
         st.session_state.dhan_token_expiry = None
 
-    # DATA SOURCE STATUS INDICATOR
     if st.session_state.dhan_token:
         st.markdown("""
         <div style="background: linear-gradient(90deg, #00ff8820, #00ff8808);
@@ -1539,7 +1303,6 @@ with st.sidebar:
         </div>
         """, unsafe_allow_html=True)
 
-        # Load token from localStorage on first render
         if 'dhan_token_loaded' not in st.session_state:
             st.markdown("""
             <script>
@@ -1561,7 +1324,6 @@ with st.sidebar:
                                     key="dhan_token_input")
         st.session_state.dhan_token = dhan_token
 
-        # Save to localStorage when token is entered
         if dhan_token:
             st.markdown(f"""
             <script>
@@ -1609,8 +1371,6 @@ def is_market_open():
     if now.hour > 15 or (now.hour == 15 and now.minute > 30):
         return False, "Market Closed (3:30 PM)"
     return True, "Market Open"
-
-# =======================================
 
 open_status, market_msg = is_market_open()
 now_str = now_ist().strftime("%d %b %Y · %H:%M:%S IST")
@@ -1679,42 +1439,62 @@ for sector, stocks in SECTOR_ETFS.items():
         STOCK_TO_SECTOR[stock] = sector
 
 # ============================================================
-# DHAN CONFIG
+# DHAN CONFIG  (FIX: hardcoded fake/placeholder IDs hata kar
+# scrip-master se dynamic, sahi security_id lookup use kiya —
+# jaisa F&O Pro Scanner (app.py) mein already kaam kar raha hai)
 # ============================================================
-DHAN_SECURITY_IDS = {
-    "RELIANCE": "2885", "TCS": "11536", "HDFCBANK": "1333", "ICICIBANK": "4963",
-    "INFY": "1594", "HINDUNILVR": "1394", "ITC": "1660", "SBIN": "3045",
-    "BHARTIARTL": "10604", "KOTAKBANK": "1922", "LT": "11483", "AXISBANK": "5900",
-    "ASIANPAINT": "236", "MARUTI": "10999", "TITAN": "3506", "SUNPHARMA": "3351",
-    "BAJFINANCE": "317", "WIPRO": "3787", "ULTRACEMCO": "11532", "NESTLEIND": "17963",
-    "POWERGRID": "14977", "NTPC": "11630", "TATASTEEL": "3499", "M&M": "2031",
-    "HCLTECH": "1851", "TECHM": "13538", "INDUSINDBK": "5258", "GRASIM": "1232",
-    "ADANIENT": "25", "CIPLA": "694", "SBILIFE": "21808", "BAJAJFINSV": "16675",
-    "BRITANNIA": "1406", "APOLLOHOSP": "157", "ONGC": "2475", "EICHERMOT": "910",
-    "TATAMOTORS": "3456", "DIVISLAB": "10568", "HDFCLIFE": "467", "COALINDIA": "20374",
-    "JSWSTEEL": "11723", "HEROMOTOCO": "1348", "BPCL": "526", "DRREDDY": "881",
-    "ADANIPORTS": "15083", "HINDALCO": "1363", "UPL": "11287", "SHREECEM": "3103",
-    "BAJAJ-AUTO": "16669", "TATACONSUM": "3432", "BERGEPAINT": "1023", "CHOLAFIN": "1034",
-    "DABUR": "1075", "GODREJCP": "1174", "HAVELLS": "1341", "ICICIPRULI": "4962",
-    "INDIGO": "1480", "JINDALSTEL": "158", "LICI": "11537", "LODHA": "1169",
-    "MCDOWELL-N": "1166", "MOTHERSON": "1167", "NAUKRI": "137", "PIDILITIND": "1404",
-    "POLYCAB": "1480", "SIEMENS": "136", "SRF": "148", "TORNTPHARM": "1168",
-    "TVSMOTOR": "1169", "ABB": "123", "ACC": "125", "AMBUJACEM": "127",
-    "AUROPHARMA": "128", "BANDHANBNK": "129", "BANKBARODA": "130", "BEL": "131",
-    "BHEL": "132", "CANBK": "133", "COLPAL": "134", "CONCOR": "135",
-    "CUMMINSIND": "136", "DMART": "137", "GAIL": "138", "GODREJPROP": "139",
-    "HAL": "140", "HINDPETRO": "141", "IDBI": "142", "IDFCFIRSTB": "143",
-    "INDUSTOWER": "144", "IOB": "145", "IRCTC": "146", "JUBLFOOD": "147",
-    "L&TFH": "148", "LUPIN": "149", "MARICO": "150", "MUTHOOTFIN": "151",
-    "NMDC": "152", "OBEROIRLTY": "153", "PFC": "154", "PNB": "155",
-    "UNIONBANK": "156", "AUBANK": "157", "RBLBANK": "158", "FEDERALBNK": "159",
-    "NIFTY": "35001", "BANKNIFTY": "35002", "FINNIFTY": "35003", "MIDCPNIFTY": "35004",
-}
-
 DHAN_BASE_URL = "https://api.dhan.co/v2"
 
 def get_dhan_headers(access_token):
     return {'Content-Type': 'application/json', 'access-token': access_token}
+
+@st.cache_data(ttl=6*3600, show_spinner=False)
+def load_dhan_scrip_master():
+    """
+    Dhan ka poora NSE equity scrip master CSV ek baar download karke
+    symbol -> security_id ka dynamic, LIVE mapping banata hai (6 ghante
+    cache hota hai).
+
+    FIX: Pehle DHAN_SECURITY_IDS ek hardcoded dict tha jismein IDs asal
+    mein Dhan se nahi aayi thi — kisi ne 123, 124, 125... karke sirf
+    sequential placeholder numbers bhar diye the. Isse kai stocks
+    (SIEMENS/CUMMINSIND, DMART/NAUKRI, AUBANK/APOLLOHOSP, etc.) ki IDs
+    clash kar rahi thi, jisse Dhan API galat/fail response deta tha aur
+    code silently Yahoo par fallback ho jaata tha — token daalne ke
+    baad bhi. Ab yahan se HAMESHA sahi, official security_id milegi.
+    """
+    try:
+        url = "https://images.dhan.co/api-data/api-scrip-master.csv"
+        df = pd.read_csv(url, low_memory=False)
+
+        exch_col = 'SEM_EXM_EXCH_ID' if 'SEM_EXM_EXCH_ID' in df.columns else 'EXCH_ID'
+        seg_col  = 'SEM_SEGMENT'     if 'SEM_SEGMENT'     in df.columns else 'SEGMENT'
+        sym_col  = 'SEM_TRADING_SYMBOL' if 'SEM_TRADING_SYMBOL' in df.columns else 'SYMBOL_NAME'
+        id_col   = 'SEM_SMST_SECURITY_ID' if 'SEM_SMST_SECURITY_ID' in df.columns else 'SECURITY_ID'
+
+        eq = df[(df[exch_col].astype(str).str.upper() == 'NSE') &
+                (df[seg_col].astype(str).str.upper() == 'E')]
+
+        mapping = dict(zip(
+            eq[sym_col].astype(str).str.upper().str.strip(),
+            eq[id_col].astype(str).str.strip()
+        ))
+        return mapping
+    except Exception:
+        return {}
+
+
+def get_security_id(ticker):
+    """Symbol -> Dhan security_id, live scrip master se (index symbols
+    ke liye chhota manual override rakha hai kyunki wo scrip master
+    mein equity segment ke saath nahi aate)."""
+    INDEX_OVERRIDES = {
+        "NIFTY": "13", "BANKNIFTY": "25", "FINNIFTY": "27", "MIDCPNIFTY": "442",
+    }
+    if ticker in INDEX_OVERRIDES:
+        return INDEX_OVERRIDES[ticker]
+    mapping = load_dhan_scrip_master()
+    return mapping.get(ticker.upper())
 
 # ============================================================
 # DATA FETCHING FUNCTIONS
@@ -1723,7 +1503,7 @@ def get_dhan_headers(access_token):
 def fetch_dhan_intraday(ticker, access_token, interval="5"):
     """Fetch 5m intraday data from Dhan API"""
     try:
-        security_id = DHAN_SECURITY_IDS.get(ticker)
+        security_id = get_security_id(ticker)
         if not security_id or not access_token:
             return None
         from_date = (now_ist() - timedelta(days=5)).strftime('%Y-%m-%d %H:%M:%S')
@@ -1807,14 +1587,11 @@ def calculate_atr(df, period=14):
 def get_corporate_actions(ticker):
     """Check for today's corporate actions, results, block deals, bulk deals"""
     try:
-        # Try nsepython first
         if NSEPYTHON_AVAILABLE:
             try:
-                # Check corporate announcements
                 ca_url = f"https://www.nseindia.com/api/corporate-announcements?index=equities&symbol={ticker}"
                 ca_data = nsefetch(ca_url)
                 if ca_data and len(ca_data) > 0:
-                    # Check if any announcement is from today
                     today_str = datetime.now(IST).strftime('%d-%b-%Y')
                     for item in ca_data[:5]:
                         desc = item.get('desc', '').lower()
@@ -1829,11 +1606,9 @@ def get_corporate_actions(ticker):
                 pass
 
             try:
-                # Check block/bulk deals
                 deals_url = "https://www.nseindia.com/api/snapshot-capital-market-info"
                 deals_data = nsefetch(deals_url)
                 if deals_data:
-                    # Check block deals
                     block_deals = deals_data.get('blockDeals', [])
                     for deal in block_deals:
                         if deal.get('symbol', '') == ticker:
@@ -1844,7 +1619,6 @@ def get_corporate_actions(ticker):
                                 'date': datetime.now(IST).strftime('%d-%b-%Y')
                             }
 
-                    # Check bulk deals
                     bulk_deals = deals_data.get('bulkDeals', [])
                     for deal in bulk_deals:
                         if deal.get('symbol', '') == ticker:
@@ -1857,12 +1631,9 @@ def get_corporate_actions(ticker):
             except:
                 pass
 
-        # Fallback: Check known earnings calendar dates (simplified)
-        # Major companies typically announce results in specific months
         today = datetime.now(IST)
         month = today.month
 
-        # This is a simplified check - in production you'd use a proper API
         return {'has_news': False, 'type': None, 'description': None, 'date': None}
 
     except Exception as e:
@@ -1878,7 +1649,6 @@ def get_oi_spurts_nsepython():
         return None, "nsepython not installed"
 
     try:
-        # Try multiple endpoints
         endpoints = [
             "https://www.nseindia.com/api/live-analysis-oi-spurts-underlyings",
             "https://www.nseindia.com/api/live-analysis-oi-spurts",
@@ -1907,13 +1677,8 @@ def get_oi_spurts_nsepython():
                         latest_oi = item.get('latestOI', 
                                     item.get('openInterest', 0)) or 0
 
-                        # NSE ka raw changeinOpenInterest field market-closed
-                        # hours mein 0 aata hai (sirf live session mein
-                        # populate hota hai) — isliye khud calculate karo,
-                        # taaki after-hours bhi sahi dikhe
                         chg_oi = float(latest_oi) - float(prev_oi)
 
-                        # Calculate OI change % if not provided
                         oi_data_quality = 'exact'
                         if float(pchg) == 0 and float(prev_oi) > 0 and float(latest_oi) > 0:
                             pchg = round(((float(latest_oi) - float(prev_oi)) / float(prev_oi)) * 100, 2)
@@ -1942,10 +1707,7 @@ def get_oi_spurts_nsepython():
     return None, "all endpoints failed"
 
 def get_oi_spurts_direct():
-    """Fallback: Direct NSE requests — lightweight single-hit session
-    (F&O Pro Scanner jaisa hi proven approach — 3 pages visit karne ki
-    jagah sirf homepage ek baar hit karke seedha API call karta hai,
-    isse tez bhi hai aur NSE ke bot-detection ko kam suspicious lagta hai)"""
+    """Fallback: Direct NSE requests — lightweight single-hit session"""
     try:
         session = requests.Session()
         headers = {
@@ -1975,18 +1737,11 @@ def get_oi_spurts_direct():
                     sym = item.get('symbol', '')
                     if not sym:
                         continue
-                    # NSE ka % field ka naam responses mein badalta rehta
-                    # hai (avgInOI / pchangeinOpenInterest / pChange) —
-                    # isliye raw field par depend karne ki bajaye hamesha
-                    # khud (latest-prev)/prev*100 se calculate karo, jo
-                    # kisi bhi field-naming se independent hai
                     pchg = item.get('avgInOI', item.get('pchangeinOpenInterest', item.get('pChange', 0))) or 0
                     prev_oi = item.get('prevOI', 0) or 0
                     latest_oi = item.get('latestOI', 0) or 0
                     prev_oi_f, latest_oi_f = float(prev_oi), float(latest_oi)
 
-                    # NSE ka raw changeinOpenInterest field market-closed
-                    # hours mein 0 aata hai — isliye khud calculate karo
                     chg_oi = latest_oi_f - prev_oi_f
 
                     if prev_oi_f > 0:
@@ -2015,22 +1770,15 @@ def get_oi_spurts_direct():
     return None, "direct failed"
 
 def get_oi_spurts():
-    """Unified OI Spurts fetcher — lean 'direct' approach (F&O Pro
-    Scanner jaisa, proven, single-hit) pehle try hota hai; nsepython
-    sirf backup ke liye hai. Pehle nsepython pehle try karne se har
-    click par NSE ko double requests jaate the (nsepython + direct dono),
-    jisse rate-limit/block jaldi lagta tha — isliye order palat diya."""
-    # Method 1: Direct requests (lean, proven — F&O scanner jaisa)
+    """Unified OI Spurts fetcher"""
     result, source = get_oi_spurts_direct()
     if result:
         return result, source
 
-    # Method 2: nsepython (backup only, agar direct fail ho)
     result, source = get_oi_spurts_nsepython()
     if result:
         return result, source
 
-    # Fallback: empty list
     return [], "failed"
 
 # ============================================================
@@ -2076,17 +1824,7 @@ def get_sector_performance():
 def analyze_stock_orb_oi(ticker, oi_info, orb_mins=15, gap_filter=True, 
                           vwap_filter=True, ema_filter=True, volume_filter=True,
                           access_token=""):
-    """
-    SUPER SCANNER CORE:
-    1. Fetch data (Dhan/Yahoo)
-    2. ORB Breakout detection
-    3. Gap + Spike Filter
-    4. 5 Filters: ORB, Volume, VWAP, EMA, Gap+Spike
-    5. OI Buildup Classification
-    6. Signal generation with accuracy
-    """
     try:
-        # Fetch data
         df, source = get_data(ticker, access_token)
         if df is None or len(df) < 20:
             return None, "No data"
@@ -2105,29 +1843,15 @@ def analyze_stock_orb_oi(ticker, oi_info, orb_mins=15, gap_filter=True,
         if len(prev_data) == 0 or len(today_data) == 0:
             return None, "Data error"
 
-        # ── FIXED ORB RANGE-CLOSE TIME + BREAKOUT VALIDITY CUTOFF ──
-        # ORB range hamesha 9:15 AM se orb_mins tak fixed hota hai (jaise
-        # 5/15/30 min slider se select kiya). Range band hone ke baad,
-        # breakout ko sirf 'breakout_valid_cutoff' minutes ke andar aana
-        # chahiye — chahe aap kisi bhi time scan karo (9:20 ho ya 1 baje),
-        # hamesha yehi fixed window (range_close se cutoff tak) ka result
-        # aayega. Cutoff nikalne ke baad breakout "expired" maana jayega.
         market_open_dt = today_data.index[0].replace(hour=9, minute=15, second=0, microsecond=0)
         range_close_dt = market_open_dt + timedelta(minutes=orb_mins)
         breakout_cutoff_min = st.session_state.get("breakout_valid_cutoff", 15)
         valid_till_dt = range_close_dt + timedelta(minutes=breakout_cutoff_min)
 
-        # FIX: opening_range strictly range_close_dt SE PEHLE tak honi chahiye
-        # (< , <= nahi) — warna jab orb_mins candle-interval ka multiple ho
-        # (5, 15, 30...), to "agli" candle (jo breakout confirm karti hai)
-        # galti se range me hi mix ho jaati thi, aur breakout detect karna
-        # lagbhag impossible ho jaata tha (kyunki wahi candle range bana rahi
-        # hoti thi). Ab range aur breakout candle strictly alag hain.
         opening_range = today_data[today_data.index < range_close_dt]
         if opening_range.empty:
             return None, "ORB range still forming"
 
-        # Breakout sirf range close hone ke turant baad (>=) se cutoff tak
         breakout_window_data = today_data[(today_data.index >= range_close_dt) & (today_data.index <= valid_till_dt)]
 
         if breakout_window_data.empty:
@@ -2138,11 +1862,6 @@ def analyze_stock_orb_oi(ticker, oi_info, orb_mins=15, gap_filter=True,
         orb_high = opening_range['High'].max()
         orb_low = opening_range['Low'].min()
 
-        # current_candle hamesha cutoff window ki AAKHRI candle hai
-        # (chahe aap kisi bhi time scan karo, ye candle fixed rahegi
-        # jab tak orb_mins/breakout_valid_cutoff change na ho)
-        # ── BOTH SIDE ORB: Check EVERY candle in breakout window ──
-        # Step 1: Current price kahan hai? (Active breakout)
         current_candle = breakout_window_data.iloc[-1]
         current_price = float(current_candle['Close'])
 
@@ -2152,7 +1871,6 @@ def analyze_stock_orb_oi(ticker, oi_info, orb_mins=15, gap_filter=True,
         orb_break_time = None
         orb_retraced = False
 
-        # Agar current price range ke bahar hai → immediate signal
         if current_price > orb_high:
             base_signal = "BUY"
             entry_price = orb_high
@@ -2162,8 +1880,6 @@ def analyze_stock_orb_oi(ticker, oi_info, orb_mins=15, gap_filter=True,
             entry_price = orb_low
             stop_loss = orb_high
         else:
-            # Step 2: Current price range ke andar hai → historical breakout check karo
-            # Sabse RECENT breakout kaun sa tha?
             breakout_time = None
             breakdown_time = None
             last_breakout_price = None
@@ -2172,13 +1888,12 @@ def analyze_stock_orb_oi(ticker, oi_info, orb_mins=15, gap_filter=True,
             for idx, row in breakout_window_data.iterrows():
                 c = float(row['Close'])
                 if c > orb_high:
-                    breakout_time = idx      # Har baar update karo = last wala milega
+                    breakout_time = idx
                     last_breakout_price = c
                 if c < orb_low:
-                    breakdown_time = idx     # Har baar update karo = last wala milega
+                    breakdown_time = idx
                     last_breakdown_price = c
 
-            # Most recent breakout decide karo
             if breakout_time is not None and breakdown_time is not None:
                 if breakout_time > breakdown_time:
                     base_signal = "BUY"
@@ -2207,14 +1922,11 @@ def analyze_stock_orb_oi(ticker, oi_info, orb_mins=15, gap_filter=True,
             else:
                 return None, "No ORB breakout"
 
-        # Baaki calculations (VWAP/Volume/ATR) bhi isi cutoff tak cap karo
-        # taaki wo bhi scan-time-independent rahein
         today_data = today_data[today_data.index <= valid_till_dt]
 
         prev_close = float(prev_data['Close'].iloc[-1])
         today_open = float(today_data['Open'].iloc[0])
 
-        # ── FILTER 1: GAP + SPIKE FILTER ──
         gap_pct = round(((today_open - prev_close) / prev_close) * 100, 2)
         if gap_filter and abs(gap_pct) >= 2.0:
             return None, f"Gap filter: {gap_pct}%"
@@ -2224,26 +1936,17 @@ def analyze_stock_orb_oi(ticker, oi_info, orb_mins=15, gap_filter=True,
         if gap_filter and first_candle_move >= 2.0:
             return None, f"Spike filter: {first_candle_move:.1f}%"
 
-        # ── FILTER 2: VWAP ──
         vwap = calculate_vwap(today_data)
         vwap_pass = False
         if vwap_filter and vwap:
-            vwap_pass = (base_signal == "BUY" and current_price > vwap) or                        (base_signal == "SELL" and current_price < vwap)
+            vwap_pass = (base_signal == "BUY" and current_price > vwap) or (base_signal == "SELL" and current_price < vwap)
 
-        # ── FILTER 3: EMA ──
-        # NOTE: EMA ab poore live df par nahi, balki valid_till_dt tak
-        # capped df par nikalta hai — taaki scan chahe 9:20 AM ho ya 1 PM,
-        # EMA hamesha wahi fixed value de (jaise baaki sab kuch already
-        # valid_till_dt tak capped hai). Multi-day history isliye rakhi
-        # gayi hai kyunki sirf aaj ke 6-10 candles se EMA20 theek se
-        # smooth nahi hota.
         df_for_ema = df[df.index <= valid_till_dt]
         ema20 = float(ema(df_for_ema['Close'], 20).iloc[-1])
         ema_pass = False
         if ema_filter:
-            ema_pass = (base_signal == "BUY" and current_price > ema20) or                       (base_signal == "SELL" and current_price < ema20)
+            ema_pass = (base_signal == "BUY" and current_price > ema20) or (base_signal == "SELL" and current_price < ema20)
 
-        # ── FILTER 4: VOLUME ──
         vol_ratio = None
         vol_pass = False
         if volume_filter:
@@ -2255,11 +1958,9 @@ def analyze_stock_orb_oi(ticker, oi_info, orb_mins=15, gap_filter=True,
                 vol_ratio = round(curr_vol / expected_vol, 1)
                 vol_pass = vol_ratio > st.session_state.get("min_vol_ratio", 2.0)
 
-        # ── FILTER 5: GAP+SPIKE (already passed above) ──
         gap_pass = True
 
-        # ── ACCURACY CALCULATION ──
-        filters_passed = 1  # ORB always passed
+        filters_passed = 1
         total_filters = 1
         retrace_note = " [RETRACED]" if orb_retraced else ""
         filter_details = [("ORB Breakout", True, f"Price broke {base_signal} @ {orb_break_time.strftime('%H:%M') if orb_break_time else 'N/A'}{retrace_note}")]
@@ -2286,7 +1987,6 @@ def analyze_stock_orb_oi(ticker, oi_info, orb_mins=15, gap_filter=True,
 
         accuracy = round((filters_passed / total_filters) * 100, 1) if total_filters > 0 else 0
 
-        # ── ATR & LEVELS ──
         atr = calculate_atr(today_data)
         if atr > 0:
             if base_signal == "BUY":
@@ -2299,16 +1999,8 @@ def analyze_stock_orb_oi(ticker, oi_info, orb_mins=15, gap_filter=True,
         risk = abs(entry_price - stop_loss)
         target = entry_price + (risk * risk_reward) if base_signal == "BUY" else entry_price - (risk * risk_reward)
 
-        # ── OI BUILDUP CLASSIFICATION ──
-        # NOTE: price_up ab AAJ ke open ke against nikalta hai (intraday/ORB
-        # context), prev_close ke against nahi — kyunki ORB signal khud
-        # intraday breakout par based hai, poore din ke prev-close-vs-now
-        # trend par nahi. Isse SELL side ORB signals bhi fairly align ho
-        # paate hain jab stock kal ke close se abhi bhi green ho lekin aaj
-        # ke open se neeche trade kar raha ho.
         oi_pct = oi_info.get('oi_chg_pct', 0)
 
-        # ── STRICT FILTER: Skip if Volume or OI below threshold ──
         if volume_filter and vol_ratio is not None:
             min_vol = st.session_state.get("min_vol_ratio", 2.0)
             if vol_ratio < min_vol:
@@ -2335,7 +2027,6 @@ def analyze_stock_orb_oi(ticker, oi_info, orb_mins=15, gap_filter=True,
             oi_buildup = "📉 LONG UNWINDING"
             oi_signal = "WEAKNESS"
 
-        # ── OI-SIGNAL ALIGNMENT ──
         oi_alignment = 0
         if base_signal == "BUY" and oi_signal in ["STRONG LONG", "LONG", "SHORT SQUEEZE"]:
             oi_alignment = 1
@@ -2346,14 +2037,11 @@ def analyze_stock_orb_oi(ticker, oi_info, orb_mins=15, gap_filter=True,
         elif base_signal == "SELL" and oi_signal in ["STRONG LONG", "LONG", "SHORT SQUEEZE"]:
             oi_alignment = -1
 
-        # ── NEWS & CORPORATE ACTION CHECK ──
         news_info = get_corporate_actions(ticker)
         has_news = news_info.get('has_news', False)
         news_type = news_info.get('type', '')
         news_desc = news_info.get('description', '')
 
-        # ── FINAL SIGNAL ──
-        # Apply news warning if corporate action detected
         if has_news:
             if accuracy >= 80 and oi_alignment >= 0:
                 final_signal = f"🚨 NEWS TODAY — {base_signal} (CAUTION)"
@@ -2576,7 +2264,6 @@ def display_signal_card(result):
     signal = result['SIGNAL']
     base = result['BASE_SIGNAL']
 
-    # Determine card class
     if "STRONG BUY" in signal:
         card_class = "card-strong-buy"
         signal_icon = "🚀"
@@ -2602,7 +2289,6 @@ def display_signal_card(result):
         signal_icon = "🟡"
         signal_color = "#6a8aaa"
 
-    # OI Buildup badge
     oi_buildup = result['OI BUILDUP']
     if "LONG BUILDUP" in oi_buildup:
         oi_badge = f'<span class="badge-long-build">{oi_buildup}</span>'
@@ -2615,7 +2301,6 @@ def display_signal_card(result):
     else:
         oi_badge = ''
 
-    # Accuracy badge
     try:
         acc_val = result['ACCURACY']
         if isinstance(acc_val, (int, float)):
@@ -2634,7 +2319,6 @@ def display_signal_card(result):
     with st.expander(f"{signal_icon} {result['STOCK']} | ₹{result['LTP']} | {result['ACCURACY']} | {result['OI BUILDUP']}"):
         st.markdown(f'<div class="{card_class}">', unsafe_allow_html=True)
 
-        # Top row: Signal + Accuracy
         c1, c2, c3 = st.columns([2, 1, 1])
         with c1:
             st.markdown(f"""
@@ -2649,7 +2333,6 @@ def display_signal_card(result):
 
         st.markdown("</div>", unsafe_allow_html=True)
 
-        # OI Section
         st.markdown("<div class='section-h'>📊 OI Analysis</div>", unsafe_allow_html=True)
         oi_col1, oi_col2, oi_col3, oi_col4 = st.columns(4)
         with oi_col1:
@@ -2681,7 +2364,6 @@ def display_signal_card(result):
             </div>
             """, unsafe_allow_html=True)
 
-        # Trade Levels
         st.markdown("<div class='section-h'>💰 Trade Levels</div>", unsafe_allow_html=True)
         t_col1, t_col2, t_col3, t_col4, t_col5 = st.columns(5)
         with t_col1:
@@ -2695,7 +2377,6 @@ def display_signal_card(result):
         with t_col5:
             st.metric("R:R", f"1:{risk_reward}")
 
-        # Technicals
         st.markdown("<div class='section-h'>📈 Technicals</div>", unsafe_allow_html=True)
         tech_col1, tech_col2, tech_col3, tech_col4 = st.columns(4)
         with tech_col1:
@@ -2707,7 +2388,6 @@ def display_signal_card(result):
         with tech_col4:
             st.markdown(f'<div style="color: #e8f0f8; background: #0d1a26; border: 1px solid #1e2d3d; border-radius: 8px; padding: 12px; margin: 4px 0; font-size: 12px; line-height: 1.5;"><b style="color: #00d4ff;">ATR:</b> ₹{result.get("atr", "N/A")}<br><small style="color: #a0b8d0;">Gap: {result.get("gap_pct", 0)}%</small></div>', unsafe_allow_html=True)
 
-        # Filter Details
         st.markdown("<div class='section-h'>📋 Filter Analysis</div>", unsafe_allow_html=True)
         filter_details = result.get('filter_details', [])
         for name, passed, detail in filter_details:
@@ -2716,7 +2396,6 @@ def display_signal_card(result):
             else:
                 st.markdown(f'<div class="filter-box-super filter-fail" style="color: #e8f0f8; background: linear-gradient(90deg, #ff406015, #0d1a26); border: 1px solid #1e2d3d; border-left: 3px solid #ff4060; border-radius: 8px; padding: 12px; margin: 4px 0; font-size: 12px; line-height: 1.5;">❌ <b style="color: #ff4060;">{name}</b> — <span style="color: #a0b8d0;">{detail}</span></div>', unsafe_allow_html=True)
 
-        # Add to Journal button
         if st.button(f"📝 Add {result['STOCK']} to Journal", key=f"journal_{result['STOCK']}"):
             entries = load_journal()
             entries.append({
@@ -2746,7 +2425,6 @@ with tab1:
     if not open_status:
         st.warning(f"⚠️ {market_msg} — Showing last available data")
 
-    # Show sector performance
     if 'sector_perf' not in st.session_state or refresh:
         with st.spinner("Loading sector data..."):
             sector_perf = get_sector_performance()
@@ -2784,13 +2462,8 @@ with tab1:
 
     st.markdown("---")
 
-    # SCAN BUTTON
     if refresh or 'scan_results' not in st.session_state:
         if refresh:
-            # Get OI Spurts — sirf ek attempt (auto-retry jaanbujh kar
-            # nahi rakha, taaki rapid repeated requests se NSE poori
-            # tarah block na kar de). Fail ho to user khud dobara
-            # "SCAN NOW" dabaye, thoda gap dekar.
             with st.spinner("🔍 Fetching NSE OI Spurts data..."):
                 oi_list, oi_source = get_oi_spurts()
                 st.session_state['oi_list'] = oi_list
@@ -2810,7 +2483,6 @@ with tab1:
                                f"(absolute OI < {_min_abs_oi:,} contracts) — inka OI% bada dikh sakta hai, "
                                f"par size chhota liya jaye.")
 
-                # Show OI preview
                 oi_preview = pd.DataFrame([{
                     'RANK': i+1,
                     'SYMBOL': x['symbol'],
@@ -2827,12 +2499,10 @@ with tab1:
                     st.caption("**~est** = prev-day OI 0/missing tha, isliye NSE ka pchg fallback use hua "
                                "(real calculated % nahi). **⚠️ LOW** = absolute OI threshold se kam, illiquid contract.")
 
-                # Determine stock list based on mode
                 if "QUICK" in scan_mode:
                     stock_list = [item['symbol'] for item in oi_list[:20]]
                     st.info(f"🏃 Quick Scan: Top {len(stock_list)} OI Spurt stocks")
                 else:
-                    # Full scan - use pre-selected universe from sidebar
                     universe = st.session_state.get('selected_universe', 'Nifty 50')
 
                     if universe == "F&O Pro Top 20":
@@ -2844,7 +2514,6 @@ with tab1:
 
                     st.info(f"🔍 Full Scan: {universe} — {len(stock_list)} stocks")
 
-                # Scan stocks
                 results = []
                 skipped = []
                 progress = st.progress(0)
@@ -2853,7 +2522,6 @@ with tab1:
                 access_token = st.session_state.get('dhan_token', '')
 
                 for i, ticker in enumerate(stock_list):
-                    # Find OI info for this ticker
                     oi_info = next((item for item in oi_list if item['symbol'] == ticker), 
                                   {'symbol': ticker, 'oi_chg_pct': 0, 'prev_oi': 0, 'latest_oi': 0, 'chg_oi': 0})
 
@@ -2886,11 +2554,9 @@ with tab1:
                 status.empty()
                 progress.empty()
 
-                # Save results
                 st.session_state['scan_results'] = results
                 st.session_state['skipped'] = skipped
 
-        # Display results
         if 'scan_results' in st.session_state:
             results = st.session_state['scan_results']
             skipped = st.session_state.get('skipped', [])
@@ -2906,7 +2572,6 @@ with tab1:
                 """, unsafe_allow_html=True)
 
             if results:
-                # Metrics
                 strong_buy = len([r for r in results if "STRONG BUY" in r['SIGNAL']])
                 buy = len([r for r in results if r['SIGNAL'] == "✅ BUY"])
                 strong_sell = len([r for r in results if "STRONG SELL" in r['SIGNAL']])
@@ -2924,7 +2589,6 @@ with tab1:
 
                 st.markdown("---")
 
-                # Filter
                 st.markdown("<div class='section-h'>📈 Scan Results</div>", unsafe_allow_html=True)
                 f1, f2 = st.columns([1, 3])
                 with f1:
@@ -2934,7 +2598,6 @@ with tab1:
 
                 df_results = pd.DataFrame(results)
 
-                # Reorder columns: News first, then LTP, then OI data
                 if not df_results.empty:
                     desired_order = [
                         'STOCK', 'SIGNAL', 'NEWS_ALERT', 'NEWS_DESC', 'LTP', 'CHG %',
@@ -2956,7 +2619,6 @@ with tab1:
                     filter_key = filter_map.get(signal_filter, "")
                     df_results = df_results[df_results['SIGNAL'].str.contains(filter_key.replace("🚀 ", "").replace("✅ ", "").replace("🔴 ", "").replace("🔻 ", ""))]
 
-                # Styled dataframe
                 styled = (
                     df_results.style
                     .map(color_signal_super, subset=['SIGNAL'])
@@ -2995,7 +2657,6 @@ with tab1:
 
                 st.markdown(styled.to_html(escape=False), unsafe_allow_html=True)
 
-                # CSV Download
                 csv = df_results.to_csv(index=False).encode('utf-8')
                 st.download_button(
                     label="📥 Download CSV",
@@ -3004,15 +2665,13 @@ with tab1:
                     mime='text/csv',
                 )
 
-                # Detailed Cards
                 st.markdown("---")
                 st.markdown("<div class='section-h'>🔍 Detailed Analysis</div>", unsafe_allow_html=True)
 
-                # Sort by signal strength
                 priority = {"🚀 STRONG BUY": 0, "✅ BUY": 1, "🔴 STRONG SELL": 2, "🔻 SELL": 3, "⚠️ WEAK BUY": 4, "⚠️ WEAK SELL": 5, "🟡 WAIT": 6}
                 sorted_results = sorted(results, key=lambda x: priority.get(x['SIGNAL'], 99))
 
-                for result in sorted_results[:10]:  # Show top 10
+                for result in sorted_results[:10]:
                     display_signal_card(result)
             else:
                 st.warning("⚠️ No signals found. Try adjusting filters or check market hours.")
