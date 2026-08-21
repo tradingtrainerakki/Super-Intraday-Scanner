@@ -1358,6 +1358,19 @@ with st.sidebar:
                 del st.session_state[key]
         st.rerun()
 
+    # ── DHAN DEBUG PANEL — asli error yahan dikhega ──
+    if st.session_state.get('dhan_token'):
+        with st.expander("🐛 Dhan Debug Info", expanded=False):
+            sm_status = st.session_state.get('scrip_master_debug', 'Not loaded yet — scan karo pehle')
+            st.markdown(f"**Scrip Master:** {sm_status}")
+            dhan_errs = st.session_state.get('dhan_debug', {})
+            if dhan_errs:
+                st.markdown("**Per-stock Dhan fetch errors:**")
+                for tkr, msg in dhan_errs.items():
+                    st.markdown(f"- **{tkr}**: {msg}")
+            else:
+                st.caption("Koi error nahi (ya abhi tak scan nahi hua)")
+
 # ============================================================
 # HEADER
 # ============================================================
@@ -1462,6 +1475,11 @@ def load_dhan_scrip_master():
     clash kar rahi thi, jisse Dhan API galat/fail response deta tha aur
     code silently Yahoo par fallback ho jaata tha — token daalne ke
     baad bhi. Ab yahan se HAMESHA sahi, official security_id milegi.
+
+    DEBUG: Ab exception silently swallow nahi hoti — asli error
+    st.session_state['scrip_master_debug'] mein store hoti hai taaki
+    UI mein dikhaya ja sake (pehle bare 'except: return {}' tha jisse
+    kabhi pata hi nahi chalta tha ki fail kyun hua).
     """
     try:
         url = "https://images.dhan.co/api-data/api-scrip-master.csv"
@@ -1479,8 +1497,10 @@ def load_dhan_scrip_master():
             eq[sym_col].astype(str).str.upper().str.strip(),
             eq[id_col].astype(str).str.strip()
         ))
+        st.session_state['scrip_master_debug'] = f"OK — {len(mapping)} symbols loaded. Columns used: {sym_col}/{id_col}"
         return mapping
-    except Exception:
+    except Exception as e:
+        st.session_state['scrip_master_debug'] = f"FAILED: {type(e).__name__}: {e}"
         return {}
 
 
@@ -1501,10 +1521,20 @@ def get_security_id(ticker):
 # ============================================================
 
 def fetch_dhan_intraday(ticker, access_token, interval="5"):
-    """Fetch 5m intraday data from Dhan API"""
+    """Fetch 5m intraday data from Dhan API.
+
+    DEBUG: Har fail-point par asli reason st.session_state['dhan_debug']
+    mein us ticker ke against store hota hai — pehle bare 'except: return
+    None' tha jisme pata hi nahi chalta tha ki security_id missing hai,
+    ya API ne 401/403/429 diya, ya response format hi alag tha."""
+    debug = st.session_state.setdefault('dhan_debug', {})
     try:
         security_id = get_security_id(ticker)
-        if not security_id or not access_token:
+        if not security_id:
+            debug[ticker] = "No security_id found for this symbol in scrip master"
+            return None
+        if not access_token:
+            debug[ticker] = "No access_token provided"
             return None
         from_date = (now_ist() - timedelta(days=5)).strftime('%Y-%m-%d %H:%M:%S')
         to_date = now_ist().strftime('%Y-%m-%d %H:%M:%S')
@@ -1518,9 +1548,11 @@ def fetch_dhan_intraday(ticker, access_token, interval="5"):
             headers=get_dhan_headers(access_token), timeout=10
         )
         if resp.status_code != 200:
+            debug[ticker] = f"HTTP {resp.status_code} (security_id={security_id}): {resp.text[:200]}"
             return None
         data = resp.json()
         if not data or 'open' not in data:
+            debug[ticker] = f"Bad response shape (security_id={security_id}): {str(data)[:200]}"
             return None
         df = pd.DataFrame({
             'Open': data['open'], 'High': data['high'], 'Low': data['low'],
@@ -1528,8 +1560,13 @@ def fetch_dhan_intraday(ticker, access_token, interval="5"):
         })
         idx = pd.to_datetime(data['timestamp'], unit='s').tz_localize('UTC').tz_convert('Asia/Kolkata')
         df.index = idx
-        return df if len(df) >= 20 else None
-    except Exception:
+        if len(df) < 20:
+            debug[ticker] = f"Only {len(df)} candles returned (need >=20), security_id={security_id}"
+            return None
+        debug.pop(ticker, None)
+        return df
+    except Exception as e:
+        debug[ticker] = f"Exception: {type(e).__name__}: {str(e)[:200]}"
         return None
 
 def fetch_yahoo_data(ticker, period="5d", interval="5m"):
